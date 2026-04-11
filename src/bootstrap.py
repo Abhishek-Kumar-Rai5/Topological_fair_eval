@@ -36,6 +36,32 @@ def cluster_bootstrap_ci(per_cluster, n_resamples=2000, ci=0.95, seed=0):
     return float(v.mean()), float(lo), float(hi)
 
 
+def machines_with_positives(df, cluster_col="machine"):
+    """Clusters that have at least one positive test window in this cell.
+
+    df: one row per (machine, seed) for ONE cell (dataset x anomaly type), with an
+    `n_positive` column from src.metrics.evaluate. Machines with no positive window
+    have no defined PR-AUC, so they are skipped for this cell (implementation_notes #5).
+    """
+    has_pos = df.groupby(cluster_col)["n_positive"].max() > 0
+    return list(has_pos[has_pos].index)
+
+
+def pooled_window_counts(df, cluster_col="machine"):
+    """Positive and normal test windows in the cell, pooled over machines.
+
+    Counted once per machine (the windows are the same for every seed).
+    """
+    per_machine = df.groupby(cluster_col)[["n_positive", "n_normal"]].first()
+    return int(per_machine["n_positive"].sum()), int(per_machine["n_normal"].sum())
+
+
+def cell_has_enough_windows(df, min_positive=20, min_normal=20, cluster_col="machine"):
+    """Prereg §8: a cell with < 20 positive or < 20 normal windows (pooled) is Inconclusive."""
+    n_pos, n_norm = pooled_window_counts(df, cluster_col)
+    return n_pos >= min_positive and n_norm >= min_normal
+
+
 def paired_delta_ci(a, b, **kwargs):
     """CI for mean(a - b), where a and b are per-cluster Series (same clusters).
 

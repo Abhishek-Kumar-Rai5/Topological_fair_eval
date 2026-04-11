@@ -48,3 +48,29 @@ def test_average_over_seeds_then_paired_delta():
 def test_nan_is_rejected():
     with pytest.raises(AssertionError):
         cluster_bootstrap_ci([0.1, np.nan, 0.2])
+
+
+# ---------------- cell rule (implementation_notes #5)
+from src.bootstrap import cell_has_enough_windows, machines_with_positives, pooled_window_counts
+
+
+def _cell(counts):
+    """Toy cell: {machine: (n_positive, n_normal)}, 2 seeds each (same windows per seed)."""
+    return pd.DataFrame([{"machine": m, "seed": s, "n_positive": p, "n_normal": n}
+                         for m, (p, n) in counts.items() for s in (0, 1)])
+
+
+def test_counts_pooled_over_machines_not_seeds():
+    df = _cell({"m1": (16, 2000), "m2": (17, 2000)})
+    assert pooled_window_counts(df) == (33, 4000)       # not doubled by the 2 seeds
+    assert cell_has_enough_windows(df)                  # 33 >= 20 although each machine < 20
+
+
+def test_small_cell_is_flagged():
+    assert not cell_has_enough_windows(_cell({"m1": (9, 500), "m2": (10, 500)}))   # 19 < 20
+    assert not cell_has_enough_windows(_cell({"m1": (50, 10), "m2": (50, 9)}))     # 19 normal
+
+
+def test_machines_without_positives_are_skipped():
+    df = _cell({"m1": (5, 100), "m2": (0, 100), "m3": (1, 100)})
+    assert machines_with_positives(df) == ["m1", "m3"]
