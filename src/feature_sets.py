@@ -5,11 +5,12 @@ Usage:
     X_train = fs.transform(train_windows)
     X_test  = fs.transform(test_windows)
 Groups are concatenated side by side, in the order written in the name.
-F3 and F5 are added here once they exist (steps 10-11).
+F5 is added here once it exists (step 11).
 """
 import numpy as np
 
 from src.features_simple import F2Features, f1_features, f1_names, f2_names
+from src.features_topo import F3Features, f3_names
 
 
 class _F1:
@@ -20,7 +21,7 @@ class _F1:
         return f1_features(windows)
 
 
-GROUPS = {"F1": (_F1, f1_names), "F2": (F2Features, f2_names)}
+GROUPS = {"F1": (_F1, f1_names), "F2": (F2Features, f2_names), "F3": (F3Features, f3_names)}
 
 
 class FeatureSet:
