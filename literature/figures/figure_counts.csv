@@ -1,0 +1,194 @@
+figure,group,category,count
+fig1a,S8,Helped,0.0
+fig1a,S8,Tied,0.0
+fig1a,S8,Mixed,0.0
+fig1a,S8,Lost,0.0
+fig1a,S8,Untested,1.0
+fig1a,S8,"Claimed, unverified",0.0
+fig1a,S8,Unclear,0.0
+fig1a,S8,TOTAL,1.0
+fig1a,I2,Helped,0.0
+fig1a,I2,Tied,1.0
+fig1a,I2,Mixed,0.0
+fig1a,I2,Lost,0.0
+fig1a,I2,Untested,0.0
+fig1a,I2,"Claimed, unverified",0.0
+fig1a,I2,Unclear,0.0
+fig1a,I2,TOTAL,1.0
+fig1a,I3,Helped,0.0
+fig1a,I3,Tied,0.0
+fig1a,I3,Mixed,0.0
+fig1a,I3,Lost,0.0
+fig1a,I3,Untested,1.0
+fig1a,I3,"Claimed, unverified",0.0
+fig1a,I3,Unclear,0.0
+fig1a,I3,TOTAL,1.0
+fig1a,S3,Helped,0.0
+fig1a,S3,Tied,0.0
+fig1a,S3,Mixed,0.0
+fig1a,S3,Lost,1.0
+fig1a,S3,Untested,1.0
+fig1a,S3,"Claimed, unverified",0.0
+fig1a,S3,Unclear,0.0
+fig1a,S3,TOTAL,2.0
+fig1a,S5,Helped,1.0
+fig1a,S5,Tied,0.0
+fig1a,S5,Mixed,0.0
+fig1a,S5,Lost,1.0
+fig1a,S5,Untested,0.0
+fig1a,S5,"Claimed, unverified",0.0
+fig1a,S5,Unclear,0.0
+fig1a,S5,TOTAL,2.0
+fig1a,I6,Helped,0.0
+fig1a,I6,Tied,0.0
+fig1a,I6,Mixed,0.0
+fig1a,I6,Lost,0.0
+fig1a,I6,Untested,1.0
+fig1a,I6,"Claimed, unverified",0.0
+fig1a,I6,Unclear,1.0
+fig1a,I6,TOTAL,2.0
+fig1a,S6,Helped,0.0
+fig1a,S6,Tied,1.0
+fig1a,S6,Mixed,1.0
+fig1a,S6,Lost,1.0
+fig1a,S6,Untested,0.0
+fig1a,S6,"Claimed, unverified",0.0
+fig1a,S6,Unclear,0.0
+fig1a,S6,TOTAL,3.0
+fig1a,S2,Helped,0.0
+fig1a,S2,Tied,0.0
+fig1a,S2,Mixed,0.0
+fig1a,S2,Lost,0.0
+fig1a,S2,Untested,3.0
+fig1a,S2,"Claimed, unverified",0.0
+fig1a,S2,Unclear,0.0
+fig1a,S2,TOTAL,3.0
+fig1a,S4,Helped,1.0
+fig1a,S4,Tied,0.0
+fig1a,S4,Mixed,0.0
+fig1a,S4,Lost,0.0
+fig1a,S4,Untested,2.0
+fig1a,S4,"Claimed, unverified",0.0
+fig1a,S4,Unclear,0.0
+fig1a,S4,TOTAL,3.0
+fig1a,I1,Helped,1.0
+fig1a,I1,Tied,1.0
+fig1a,I1,Mixed,1.0
+fig1a,I1,Lost,0.0
+fig1a,I1,Untested,0.0
+fig1a,I1,"Claimed, unverified",1.0
+fig1a,I1,Unclear,0.0
+fig1a,I1,TOTAL,4.0
+fig1a,S1,Helped,2.0
+fig1a,S1,Tied,1.0
+fig1a,S1,Mixed,0.0
+fig1a,S1,Lost,0.0
+fig1a,S1,Untested,3.0
+fig1a,S1,"Claimed, unverified",2.0
+fig1a,S1,Unclear,2.0
+fig1a,S1,TOTAL,10.0
+fig1b,Replacement,Helped,1.0
+fig1b,Replacement,Tied,1.0
+fig1b,Replacement,Mixed,0.0
+fig1b,Replacement,Lost,2.0
+fig1b,Removal-only,Helped,2.0
+fig1b,Removal-only,Tied,2.0
+fig1b,Removal-only,Mixed,0.0
+fig1b,Removal-only,Lost,1.0
+fig1b,Not-isolated,Helped,2.0
+fig1b,Not-isolated,Tied,1.0
+fig1b,Not-isolated,Mixed,2.0
+fig1b,Not-isolated,Lost,0.0
+fig1,ALL,full_text,24.0
+fig1,ALL,abstract_only,8.0
+fig2,R1 Matched baseline,Y,3.0
+fig2,R1 Matched baseline,P,12.0
+fig2,R1 Matched baseline,N,11.0
+fig2,R1 Matched baseline,U,6.0
+fig2,R1 Matched baseline,NA,0.0
+fig2,R1 Matched baseline,pct_Y_all,9.4
+fig2,R1 Matched baseline,pct_Y_applicable,9.4
+fig2,R2 Replacement,Y,3.0
+fig2,R2 Replacement,P,1.0
+fig2,R2 Replacement,N,21.0
+fig2,R2 Replacement,U,7.0
+fig2,R2 Replacement,NA,0.0
+fig2,R2 Replacement,pct_Y_all,9.4
+fig2,R2 Replacement,pct_Y_applicable,9.4
+fig2,R3 Leakage-safe split,Y,0.0
+fig2,R3 Leakage-safe split,P,5.0
+fig2,R3 Leakage-safe split,N,11.0
+fig2,R3 Leakage-safe split,U,10.0
+fig2,R3 Leakage-safe split,NA,6.0
+fig2,R3 Leakage-safe split,pct_Y_all,0.0
+fig2,R3 Leakage-safe split,pct_Y_applicable,0.0
+fig2,R4 Clean threshold,Y,1.0
+fig2,R4 Clean threshold,P,2.0
+fig2,R4 Clean threshold,N,4.0
+fig2,R4 Clean threshold,U,11.0
+fig2,R4 Clean threshold,NA,14.0
+fig2,R4 Clean threshold,pct_Y_all,3.1
+fig2,R4 Clean threshold,pct_Y_applicable,5.6
+fig2,R5 Realistic metrics,Y,1.0
+fig2,R5 Realistic metrics,P,8.0
+fig2,R5 Realistic metrics,N,16.0
+fig2,R5 Realistic metrics,U,6.0
+fig2,R5 Realistic metrics,NA,1.0
+fig2,R5 Realistic metrics,pct_Y_all,3.1
+fig2,R5 Realistic metrics,pct_Y_applicable,3.2
+fig2,R6 Real uncertainty,Y,0.0
+fig2,R6 Real uncertainty,P,5.0
+fig2,R6 Real uncertainty,N,20.0
+fig2,R6 Real uncertainty,U,7.0
+fig2,R6 Real uncertainty,NA,0.0
+fig2,R6 Real uncertainty,pct_Y_all,0.0
+fig2,R6 Real uncertainty,pct_Y_applicable,0.0
+fig2,R7 Cost,Y,2.0
+fig2,R7 Cost,P,7.0
+fig2,R7 Cost,N,17.0
+fig2,R7 Cost,U,6.0
+fig2,R7 Cost,NA,0.0
+fig2,R7 Cost,pct_Y_all,6.2
+fig2,R7 Cost,pct_Y_applicable,6.2
+fig2,R8 Robustness,Y,0.0
+fig2,R8 Robustness,P,5.0
+fig2,R8 Robustness,N,20.0
+fig2,R8 Robustness,U,7.0
+fig2,R8 Robustness,NA,0.0
+fig2,R8 Robustness,pct_Y_all,0.0
+fig2,R8 Robustness,pct_Y_applicable,0.0
+fig2,R9 Adversary,Y,0.0
+fig2,R9 Adversary,P,0.0
+fig2,R9 Adversary,N,25.0
+fig2,R9 Adversary,U,7.0
+fig2,R9 Adversary,NA,0.0
+fig2,R9 Adversary,pct_Y_all,0.0
+fig2,R9 Adversary,pct_Y_applicable,0.0
+fig2,R10 Benchmark validity,Y,0.0
+fig2,R10 Benchmark validity,P,1.0
+fig2,R10 Benchmark validity,N,6.0
+fig2,R10 Benchmark validity,U,8.0
+fig2,R10 Benchmark validity,NA,17.0
+fig2,R10 Benchmark validity,pct_Y_all,0.0
+fig2,R10 Benchmark validity,pct_Y_applicable,0.0
+fig2,R11 Interpretation,Y,1.0
+fig2,R11 Interpretation,P,14.0
+fig2,R11 Interpretation,N,6.0
+fig2,R11 Interpretation,U,7.0
+fig2,R11 Interpretation,NA,4.0
+fig2,R11 Interpretation,pct_Y_all,3.1
+fig2,R11 Interpretation,pct_Y_applicable,3.6
+fig2,R12 Code,Y,4.0
+fig2,R12 Code,P,1.0
+fig2,R12 Code,N,22.0
+fig2,R12 Code,U,5.0
+fig2,R12 Code,NA,0.0
+fig2,R12 Code,pct_Y_all,12.5
+fig2,R12 Code,pct_Y_applicable,12.5
+fig2,R13 Data,Y,14.0
+fig2,R13 Data,P,5.0
+fig2,R13 Data,N,8.0
+fig2,R13 Data,U,5.0
+fig2,R13 Data,NA,0.0
+fig2,R13 Data,pct_Y_all,43.8
+fig2,R13 Data,pct_Y_applicable,43.8
