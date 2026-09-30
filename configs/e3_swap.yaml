@@ -1,0 +1,20 @@
+# E3: swap test on SMD, same detector for every feature set (prereg §7).
+experiment: E3
+dataset: SMD
+data_root: data/SMD
+windows: {size: 60, step: 10, label_tail: 10}
+split: {val_frac: 0.2}
+threshold: {false_alarm_rate: 0.01, on: validation}
+seeds: [0, 1, 2, 3, 4]
+minutes_per_point: 1.0
+detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}
+feature_sets: ["F1", "F1+F2", "F1+F3", "F1+F2+F3", "F5"]   # F5 exploratory, no verdict
+comparisons:                                                # §8
+  main_gain: {a: "F1+F2+F3", b: "F1+F2"}                    # Δ
+  swap_gain: {a: "F1+F3", b: "F1+F2"}                       # Δs
+metrics: [pr_auc, recall_at_thr, false_alarms_per_day, roc_auc, runtime_per_window]
+primary_metric: pr_auc
+point_adjustment: false
+reporting: overall_only
+bootstrap: {cluster: machine, n_resamples: 2000, ci: 0.95}
+verdict: {equivalence_margin: 0.02, min_positive_windows: 20, min_normal_windows: 20}  # §8

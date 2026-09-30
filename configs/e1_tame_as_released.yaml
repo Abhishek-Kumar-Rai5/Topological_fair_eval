@@ -1,0 +1,11 @@
+# E1: TAME as released, unchanged, vs its reported SMD ROC-AUC (prereg §7).
+experiment: E1
+dataset: SMD
+method:
+  name: TAME
+  repo: external/TAME
+  commit: e77c0d93434bdd6b20db9db60e524a30a20a35b5
+  run_as_released: true          # no changes at all (incl. its own threshold and best-detector pick)
+reported_smd_roc_auc: 0.808      # number we compare against
+timebox_days: 2                  # if it cannot run: report the failure with logs
+used_for: P3                     # P3 has no verdict if E1 fails (prereg §8)
