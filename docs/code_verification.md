@@ -81,6 +81,10 @@
 
 ---
 
+**Note (tdaad @ `d103a2c`, 19 Nov 2026):** the README quickstart (`np.random.randn(1000, 3)`) fails with any gudhi version (tested 3.11.0 and 3.13.0), because tdaad uses the sensors as points and 3 sensors can't form an H1 loop, so Atol gets an empty H1 diagram; with 38 channels (SMD width) it runs.
+
+---
+
 ## Rules for the paper
 
 - Always cite the commit and lines.
