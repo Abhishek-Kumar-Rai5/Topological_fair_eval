@@ -4,6 +4,21 @@ Updated at the end of every task. Latest entry first.
 
 
 
+
+## 2026-11-19 (night): E3 and E2 (our pipelines) run on SMD
+
+**Done**
+- E3 (5 feature sets) and E2 our pipelines (F1+F2, F1+F2+F3): 28 machines × 5 seeds, all at commit `9c28f8f`, `git_dirty` false. The laptop shut down twice mid-run; `--resume` continued from the saved machines (one half-written machine, 2-1, was deleted and rerun).
+- `scripts/summarize_smd.py` applies §6/§8 and writes `results/<exp>/<exp>_summary.csv` and `_verdicts.csv`.
+- Verdicts (prereg §8, PR-AUC): E3 Δ = +0.054 [0.035, 0.076] Helps; Δs = +0.067 [0.041, 0.097] Helps; E2 Δ identical to E3. Details in the summary files. Not interpreted yet.
+
+**Next**
+1. Adapters for TADA, PHANTOM, TAME (rest of E2), E1 (TAME as released, 2-day timebox), E5 injections, E4 CTU-13 + zigzag.
+2. Harden `--resume` and file writes against crashes (write to a temp file then rename; skip only valid files).
+
+**Open decisions (Anirudh)**
+- Earlier items still open: fill TBD dates in `docs/decision_log.md`; check the `prereg-v3` tag is on the remote; Step 4 self re-check.
+
 ## 2026-11-19 (evening): Step 11 F5 and the runner
 
 **Done**

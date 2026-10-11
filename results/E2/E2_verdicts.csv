@@ -1,0 +1,2 @@
+comparison,delta_pr_auc,ci_lo,ci_hi,verdict,pooled_positive_windows,pooled_normal_windows
+F1+F2+F3 - F1+F2,0.054022450093904516,0.03494244038900431,0.0758561480638137,Helps,3244,65819
