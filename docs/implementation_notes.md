@@ -60,3 +60,48 @@ Cost: about 39 ms per window (machine-1-1); about 1.5 hours single-threaded for 
 - **Behaviour types: the label strings are not used** (they are traffic types: DNS, SPAM, CC1, HTTP-Ad, Binary-Download, not behaviours). Each scenario gets the type of its **README-listed** behaviours, and **Mixed** if they disagree. This is the prereg §2 fallback, so it is **not a deviation**. Decided by Anirudh, 2026-11-19.
 - **Infected hosts** = the IPs the README lists as `Label: Botnet`. Other IPs that send From-Botnet flows (scenarios 3 and 12) are not infected hosts. Confirmed by Anirudh, 2026-11-19.
 - E4 limitation (data fact, no rule change): see `deviations_log.md`.
+
+## E5 injections (`src/injections.py`, `src/e5.py`, `scripts/summarize_e5.py`)
+
+Prereg §3 and §7 fix the six types, magnitudes, duration (60), count (10 per type × magnitude × machine) and the rule "normal test segments only". The points below are what the prereg leaves open. All were fixed before any E5 run. Confirmed items are marked.
+
+| # | Point | Our choice |
+|---|---|---|
+| 22 | Positive window (**confirmed by Anirudh, 2026-11-19**) | The §2 rule: a window is positive if an injected point lies in its **final 10 samples**. A window that overlaps an injection only earlier is **excluded**. A window that touches a real labelled anomaly anywhere is **excluded** (so positives are purely injected and normals purely normal). Normal = no injected and no real labelled point in the window |
+| 23 | Channels for V1–V3 (**confirmed**) | Any channel with **training std ≥ 0.01** (same floor as F3), chosen per injection at random. σ is that channel's training std. Constant and near-constant channels are excluded, because "+2σ" of a std of 1e-5 would be invisible. All 38 channels qualify except those machine-channels (about a third of channels on SMD have std below 0.01) |
+| 24 | Fewer than 10 fit (**confirmed**) | We place as many as fit and **report every machine × type with fewer than 10** in `E5_placement.csv` (columns: n_placed, reason). `summarize_e5.py` prints them. A type with no eligible channel on a machine gets 0 sites and the reason "no eligible channel" |
+| 25 | V3 "variance ×c" (**confirmed: literal**) | The **variance** is multiplied by c: deviations from the segment mean are multiplied by √c. The segment mean is kept |
+| 26 | Dominant lag | The highest **local maximum** of the training autocorrelation over lags 2–30 (the F2 lag range). Periodic if that ACF value is > 0.5. A drifting channel has a high but monotone ACF, so it has no peak and is not periodic |
+| 27 | S1 factor | The period is **divided** by f: the segment is read f times faster (linear interpolation), so f = 2 halves the period |
+| 28 | S2 | Shifts the **periodic** channel of a coupled pair (a phase shift needs a period); the partner is untouched. Shift = fraction × that channel's dominant lag, by linear interpolation of the earlier series. A pair needs at least one periodic channel |
+| 29 | S3 | Replaces a block of round(q × 60) samples (q = magnitude) with the same block of a random 60-sample, label-free segment of the same channel, taken ≥ 60 samples away from the unmodified test series. The partner is untouched |
+| 30 | V1, V2 | V1 adds +kσ to the whole segment of one channel. V2 adds +kσ to 3 distinct random points of one channel |
+| 31 | Spacing | At least **120 samples between the end of one injection and the start of the next** (so at least 180 start to start). This satisfies both readings of "≥ 120 apart" |
+| 32 | Never touch labelled anomalies | The 60-sample footprint, and the samples an injection reads from (S1 up to 3 × 60, S2 up to half a period back), contain no real labelled point |
+| 33 | Eligibility data | Computed on the **first 80% of the training file** (the fit part), so validation data is not even used to choose channels. Pairs: Pearson |r| > 0.7 among non-constant channels |
+| 34 | One site set per (machine, type) | Sites, channels and random draws depend on (machine, type) only, so the three magnitudes are paired. The detector seed does not change them |
+| 35 | Detector and threshold | Fitted once per (machine, seed, feature set) on the unmodified training windows. Threshold at 1% on validation. They are identical for every injected series, because injections never touch training or validation |
+| 36 | Speed shortcut | Only windows overlapping an injection are recomputed; other windows reuse the features of the unmodified test series. Exact, because every feature is computed per window (checked in `tests/test_e5.py`) |
+| 37 | P2 Bonferroni | A volume type "helps" for P2 if the paired Δ is ≥ 0.02 **and** the lower end of a CI at level 1 − 0.05/3 (98.3%) is above 0. P2 is Supported only if all three volume types are "No added value" at the decision magnitude; otherwise Inconclusive |
+| 38 | Result files | `by_machine/<m>.csv` (written last, marks the machine as done), `by_machine/<m>_placement.csv`, merged `E5_results.csv` and `E5_placement.csv`, then `E5_summary.csv`, `E5_verdicts.csv`, `E5_predictions.csv`, `E5_curves.png` |
+
+Atomic writes (all result files): written to a temp file in the same folder, flushed, then renamed; the sidecar is written after the data file. `--resume` re-runs a machine unless its file is **valid**: non-empty, parses, has at least one row, and its sidecar exists, parses and records the same row count (`src/metadata.is_valid_result`).
+
+## E2 re-tested methods (`src/e2_methods.py`, run with `scripts/run_experiment.py configs/e2_fair_retest.yaml --methods`)
+
+Prereg §5: TADA and PHANTOM with default parameters; TAME with two changes only (our threshold, detector fixed in advance to Isolation Forest). The runner sets the threshold (1% false alarms on validation windows) for every method; the adapters never see labels. Results go to `results/E2m/` so the E2 file for our own pipelines is not touched. A method that raises is written to `E2m_failures.csv` (never hidden); the other methods still run. **These are my choices; please confirm or change them before the run.**
+
+| # | Point | Our choice |
+|---|---|---|
+| 39 | Windows | All methods are scored on **our windows** (60 samples, step 10), our split (fit part 80%, validation last 20%) and our labels, so they are comparable with F1+F2 and F1+F2+F3. TAME's released protocol (window 200, step 200, all 28 machines pooled into one stream, validation 18%) is **not** used for E2; it belongs to E1. This is a third change to TAME beyond the two in §5 and needs your OK |
+| 40 | TADA windows | `tdaad` defaults (window 100, step 5, `tda_max_dim` 1, 5 centres; `contamination` unused). Our window ending at e gets the score of the TADA window **ending at e** (start e − 100), so it sees only the past; the first four windows (e < 100) take TADA's first window. Anomaly score = −(its robust Mahalanobis score). Uses `_raw_score_samples` (per-window scores), not the public `score_samples`, which sums the scores of all windows covering a time step and would look 90 samples into the future |
+| 41 | TADA seeds | `random_state` = our seed (affects the robust covariance fit). The k-means inside `tdaad` is hard-coded to seed 42 |
+| 42 | PHANTOM distance | **`main.py` scores with the Wasserstein distance** (`compare(..., 2)`); `AnomalyScore.compare` defaults to bottleneck (method 0), but the script never uses the default. CLAUDE.md §4 says "bottleneck"; **that line should say Wasserstein (main.py) — please check and correct it**. We follow `main.py` |
+| 43 | PHANTOM vector | Per channel: mean, median, min, max (PHANTOM's `mean_values`, `median_values`, `min_value`, `max_value`) → 152 numbers per window. The released config is for log records, so this part has to be chosen |
+| 44 | PHANTOM order | Baseline = first 4 training windows (`BASELINE_LENGTH 4000 / WINDOW_LENGTH 1000`, probability 1). The rest of the fit windows are streamed (rolling baseline update only if score < 0.1, the released `ANOMALY_THRESHOLD`). Then the validation windows are scored (state continues), then the test windows are scored from a **copy** of that state. The test pass also rolls the baseline, using scores only. Deterministic: the 5 seeds are copies of one run |
+| 45 | PHANTOM ripser | `ripser.ripser(D, distance_matrix=True)["dgms"][0]` as in `main.py`; persim ignores the infinite bar (warning suppressed) |
+| 46 | TAME features | TAME's own `TDAPersistenceImageExtractor` imported from `external/TAME/utils/tda_features.py` (3×1 delay embedding, VR H0+H1, 40×40 persistence images, σ = 1), then `StandardScaler` + PCA(50) fitted on the training windows. Not copied: TAME has no licence. Not z-scored per channel (SMD loader does not) |
+| 47 | TAME detectors | **IF is the one fixed in advance** (200 trees, as in TAME, seed = ours). GMM (4 components, full, reg 1e-4) and One-Class SVM (ν 0.01, γ 0.1) use TAME's settings and are reported separately (`TAME-GMM`, `TAME-OCSVM`). **Deep SVDD is not run** (needs torch, not installed); it is covered by E1. "TAME (best)" is never computed |
+| 48 | **TAME needs giotto-tda, not installed.** `pip install --dry-run giotto-tda` in the main venv would **downgrade numpy to 1.26.4 and scikit-learn to 1.3.2**, which would change the library versions of every other result. Use a **separate venv** for the TAME run (or install with `--no-deps` and check that it imports). Until then `--methods` records TAME failures in `E2m_failures.csv` and still runs TADA and PHANTOM. Tests use a stand-in feature function, and one test uses the real extractor when `gtda` is importable |
+
+Runtime (toy 38-channel machine of 25,000 samples, one seed): PHANTOM about 2 s, TADA about 5 s. Real data will differ. TAME's cost cannot be measured until giotto-tda is installed.
