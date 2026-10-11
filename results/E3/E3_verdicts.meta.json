@@ -1,6 +1,6 @@
 {
-  "git_commit": "9c28f8f942bc1f7642f2ae14c3e22adbc888c1f5",
-  "git_dirty": false,
+  "git_commit": "23cf40de32d597e6626629e26828808d3eca3fce",
+  "git_dirty": true,
   "seed": {
     "model_seeds": [
       0,
@@ -99,7 +99,7 @@
     "processor": "",
     "cpu_count": 16
   },
-  "created_utc": "2026-11-19T16:19:11+00:00",
+  "created_utc": "2026-11-19T17:56:51+00:00",
   "source": "E3_results.csv",
   "bootstrap": {
     "n_resamples": 2000,

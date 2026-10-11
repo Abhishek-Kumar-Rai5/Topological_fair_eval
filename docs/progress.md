@@ -5,6 +5,17 @@ Updated at the end of every task. Latest entry first.
 
 
 
+
+## 2026-11-19 (night, later): ROC-AUC added, exploratory Δ against F1
+
+**Done** (from existing E3 results; nothing rerun)
+- `scripts/summarize_smd.py` now also reports ROC-AUC (mean [95% CI]); E3 re-summarised. The PR-AUC numbers and §8 verdicts are unchanged.
+- Checked: false alarms per day merges consecutive false-alarm windows into one event (`src/metrics.py` `count_alarm_events`); the sampling interval is `minutes_per_point: 1.0` in `configs/e2_fair_retest.yaml` and `configs/e3_swap.yaml`, passed by `src/runner.py` to `evaluate`. F3 embeds the whole 38-channel window jointly (one 114-dim point cloud per window). F5 outputs 3 features.
+- **EXPLORATORY, not in the prereg** (`results/E3/E3_exploratory.csv`): paired cluster-bootstrap Δ PR-AUC against F1: F1+F2 −0.021 [−0.035, −0.006]; F1+F3 +0.047 [0.025, 0.072]; F1+F2+F3 +0.034 [0.012, 0.056]. Main Δ (F1+F2+F3 − F1+F2) is above 0 on 23 of 28 machines (4 below, 1 equal). No verdicts are attached to these.
+
+**Open decisions (Anirudh)**
+- Earlier items still open: fill TBD dates in `docs/decision_log.md`; check the `prereg-v3` tag is on the remote; Step 4 self re-check; harden `--resume` and file writes.
+
 ## 2026-11-19 (night): E3 and E2 (our pipelines) run on SMD
 
 **Done**
