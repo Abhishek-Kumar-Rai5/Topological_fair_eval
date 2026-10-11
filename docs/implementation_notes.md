@@ -25,15 +25,15 @@ These are choices the preregistration leaves open. None of them changes a prereg
 
 Feature sizes on SMD: F1 = 152, F2 = 82 (5 + 76 + 1), F1+F2 = 234.
 
-## F3 topology features (step 10, `src/features_topo.py`) — **pending Anirudh's confirmation**
+## F3 topology features (step 10, `src/features_topo.py`) — **confirmed by Anirudh, 2026-11-19**
 
-Prereg §4: "Delay embedding (m = 3, τ = 1). Vietoris–Rips persistence via `ripser`, H0 and H1. Summarised by: number of bars; total, max, mean and std of lifetimes; persistent entropy; Betti curve at 10 fixed multiples of the median pairwise distance. 32 features, no tuning."
+Prereg §4: "Delay embedding (m = 3, τ = 1). Vietoris–Rips persistence via `ripser`, H0 and H1. Summarised by: number of bars; total, max, mean and std of lifetimes; persistent entropy; Betti curve at 10 fixed multiples of the median pairwise distance. 32 features, no tuning." All four choices below were fixed before any detector ran, and are logged as clarifications in `deviations_log.md`.
 
 | # | Point | Our choice | Why |
 |---|---|---|---|
 | 12 | What is embedded | The **whole 38-channel window**: point t = [xₜ, xₜ₊₁, xₜ₊₂] with xₜ ∈ ℝ³⁸, so 58 points in ℝ¹¹⁴, one point cloud and one diagram pair per window | "32 features" = 2 dims × 16 summaries, which only works with one diagram per window. Per-channel embedding would give 38 × 32 = 1,216 features |
-| 13 | Scaling before distances | **None.** The provider-scaled SMD values (already in [0, 1]) are used as given | "No tuning", and nothing to fit. A training-fitted standardiser would blow up near-constant channels and let their noise dominate the distances |
-| 14 | Betti curve scales | **0.1, 0.2, …, 1.0 × the window's own median pairwise distance**; a bar is alive at s if birth ≤ s < death | Prereg says "10 fixed multiples" but not which. Per-window median makes the curve scale-free; ≤ 1.0× because H0 bars die and H1 bars live mostly below the median distance |
-| 15 | Bar bookkeeping | H0's one infinite bar is excluded from the bar count and lifetime statistics but counted in the Betti curve. Zero-length bars are not reported by ripser. Std uses ddof = 0; entropy uses natural log; empty diagram gives 0s | Every window has exactly one infinite H0 bar, so it carries no information for the statistics, but it is a real component for the Betti number |
+| 13 | Scaling before distances | **Z-score each channel with the machine's training mean and std** (all time points of the training windows), std floored at **0.01**. Fitted on training data only | Prereg: every fitted transform uses training data only. The floor stops near-constant channels from blowing up: on SMD, 192 of 1,064 machine-channels have training std exactly 0 and 337 have std below 0.01. The floor value is 1% of the [0, 1] range; it is a fixed constant, not tuned |
+| 14 | Betti curve scales | **0.2, 0.4, …, 2.0 × the training median pairwise distance** (the multiples from prereg v2). The median is computed **once per machine**, pooled over all pairwise distances of all training windows (in z-scored space), and is the same for every window. A bar is alive at s if birth ≤ s < death | A per-window scale would divide away changes in overall size (volume) and rig the volume-vs-shape test (E5) |
+| 15 | Infinite H0 bar | **Dropped everywhere**, including the Betti curve. All summaries use finite bars only. Zero-length bars are not reported by ripser. Std uses ddof = 0; entropy uses natural log; an empty diagram gives 0s | Every window has exactly one infinite H0 bar, so it carries no information |
 
-Feature sizes: F3 = 32; F1+F2+F3 = 266. Real-data check: all 141,226 SMD windows finite, about 1.6 ms per window; H1 bars per window median 20 (range 0–58).
+Feature sizes: F3 = 32; F1+F2+F3 = 266. Real-data check (machine-1-1 and machine-3-11): all values finite, about 1.2 ms per window, fit about 0.4 s per machine, H1 bars per window median 22 and 29. The training median distance is 3.9 and 5.6.

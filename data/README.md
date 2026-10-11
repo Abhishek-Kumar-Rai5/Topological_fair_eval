@@ -5,7 +5,7 @@
 | Dataset | Source | Files | SHA-256 |
 |---|---|---|---|
 | SMD | github.com/NetManAIOps/OmniAnomaly (`ServerMachineDataset/`) @ `7fb0e0acf89ea49908896bcc9f9e80fcfff6baf4` | `data/SMD/`: 113 files (below) | per-file list below; digest of the list: `4c5c17f61affcc489fce356ef28c04f306f585595fbb3f6cc17d3f7769d880a0` |
-| CTU-13 | stratosphereips.org/datasets-ctu13 (CTU-13-Dataset.tar.bz2) | TBD (Anirudh downloads on the laptop) | TBD |
+| CTU-13 | Official Stratosphere Mega backup, https://mega.nz/#F!vdRmBA6D!yMZXx74nnu8GjhdwSF54Sw (linked from stratosphereips.org/datasets-ctu13) | `data/CTU-13/<capture>/`: 12 `.binetflow.xz` + 13 READMEs (below). **Scenario 10 (capture 51) has no `.binetflow`** | per-file list below; digest of the list: `13c898fcedb14718946b0499739c0fc03a1b1cdb45538d75d173c5183d504cec` |
 
 ## SMD
 
@@ -175,4 +175,61 @@ a27a88c5d96c3384e07776dd2ced9956f7ea78b1070b87786352bc6024129d72  ./train/machin
 5eb1f16e62c30eb498e968b2c6da3e8f60c8367e264f771245a970362d7d8574  ./train/machine-3-7.txt
 414ba622ae70118948a3940009ce4e90580b494ea07f9e03893c26e102edd855  ./train/machine-3-8.txt
 7896b57b65da1d48ee992ba128fb914ae7e6d2bef8ea4ed8df039657fc017468  ./train/machine-3-9.txt
+```
+
+## CTU-13
+
+- **Source:** the official Stratosphere backup on Mega, https://mega.nz/#F!vdRmBA6D!yMZXx74nnu8GjhdwSF54Sw, which is linked from https://www.stratosphereips.org/datasets-ctu13. That page notes: "keep in mind that the main site is the authoritative copy". The main site (`mcfp.felk.cvut.cz`, archive `CTU-13-Dataset.tar.bz2`) refused connections from this laptop on 2026-11-19 (two `wget -c` attempts timed out).
+- **Downloaded:** 2026-11-19 by Anirudh, per scenario folder. Only the labelled bidirectional NetFlow files and the READMEs; no pcaps.
+- **Format:** `capture*.binetflow.xz`, xz-compressed CSV (Argus bidirectional NetFlow). Kept compressed; pandas reads `.xz` directly. All 12 archives pass `xz -t`.
+- **Folder = capture number.** Scenario = capture − 41, per the scenario list on the Stratosphere page:
+
+| Scenario | Folder | File | Flows |
+|---:|---|---|---:|
+| 1 | 42 | capture20110810.binetflow.xz | 2,824,636 |
+| 2 | 43 | capture20110811.binetflow.xz | 1,808,122 |
+| 3 | 44 | capture20110812.binetflow.xz | 4,710,638 |
+| 4 | 45 | capture20110815.binetflow.xz | 1,121,076 |
+| 5 | 46 | capture20110815-2.binetflow.xz | 129,832 |
+| 6 | 47 | capture20110816.binetflow.xz | 558,919 |
+| 7 | 48 | capture20110816-2.binetflow.xz | 114,077 |
+| 8 | 49 | capture20110816-3.binetflow.xz | 2,954,230 |
+| 9 | 50 | capture20110817.binetflow.xz | 2,087,508 |
+| 10 | 51 | **missing** (README only; expected `capture20110818.binetflow`) | — |
+| 11 | 52 | capture20110818-2.binetflow.xz | 107,251 |
+| 12 | 53 | capture20110819.binetflow.xz | 325,471 |
+| 13 | 54 | capture20110815-3.binetflow.xz | 1,925,149 |
+
+Label facts (prereg §10 item 1) are in `docs/ctu13_facts.md`.
+
+### CTU-13 SHA-256 checksums
+
+Paths are relative to `data/CTU-13/`. To verify: `cd data/CTU-13 && sha256sum -c` with the list below.
+
+```
+ab71abcaa575b10e329606057bd37d46a53cda2ed27ec45f3395d34dfbd4380a  42/capture20110810.binetflow.xz
+63bead68db3724972731a134fb117d71c17584b27bfa220e8bc1f1d435aa3f94  42/README.html
+178ff0275a26bf543a58ac49d3dd84804f524057a825416acaf94e5810d70543  43/capture20110811.binetflow.xz
+f7f3c037ea39fa716ad388b330e2a48645bbf209762098eaa0c35f2138a0e612  43/README
+6b855d9e2a736cdc13f44d044ec115d131597ddb24d2d85ccce685c4906854c5  44/capture20110812.binetflow.xz
+8d4d391f2cefbf12e9fd5aa97159dc6047a14e6a4a83b88ece27c44a23c18fb4  44/README-44
+3ddff4a0e0208ca2e6c98aca443d534ad3737f5976b7c6aaddd25122fdae6966  45/capture20110815.binetflow.xz
+1826dd7913cffdab5d1907e784ec1af9040aec1dcc6f7f094ec3d32b5561eaf5  45/README-45
+77ee55723502d78b4673293718818dd4474476e75656227f80616f6033d0e02a  46/capture20110815-2.binetflow.xz
+52b68b8f537463dec56d766652b053ac1122d653062698a609a765e7099ad8cd  46/README-46
+743b02e18a66facefad46dc107a88180a36ab53476e929327a12a9f4eeda787c  47/capture20110816.binetflow.xz
+f002a281128bfb1dd25762c4740ff6e02013f16c1bb82db5e6ddfe46a37b8c7a  47/README-47
+785c7abbd9169eb454e12edf68f5431081d3514607e5fa1086731861d285795a  48/capture20110816-2.binetflow.xz
+10019db9572422993a6153c6a999c74a45c1268e180681284cdf6c74ca96ae65  48/README-48
+6f558061b76dee6f859489d1a5c1cd6a3a5d93682b325c587bb9f626eab930bc  49/capture20110816-3.binetflow.xz
+5fc9b33dc9f33286792b1d20a7e095c7f96347ec478e7358bfd53ee8db091a4a  49/README-49
+57cdad839df2697052f2f8152ac05fa06ca420f1ee0a847a3d27be06a2afc321  50/capture20110817.binetflow.xz
+aca7f0a37ad1c403bf61ac5540f5ec7650b10c741c41d08bb8a631c822751218  50/README-50
+8d53b13d21c9495909b1c2257e50a5bfe228b3105a8b4027385b53194ded0931  51/README-51
+e925db754b09a1490c609a624a316ec40542ff47aca4fc58853df9959fe7319a  52/capture20110818-2.binetflow.xz
+dbd8baca23479b4b88b43860805fd5914b0a0dc5dd3e7081648642703b9a7976  52/README-52
+11069acc42352ecc33e11b38ac92bfd43c6decc3652a41de29e0547d8970c754  53/capture20110819.binetflow.xz
+ab38c7a72341fef075f16825fff9ae7a39d873e6343452b73216b521e35516cf  53/README-53
+979ed61c91c1f52c1086401b0de89428b8d4153048f74abe5f2b7204dbff201e  54/capture20110815-3.binetflow.xz
+93cd63f011c79eaef16970d628256c9486013e2e4566c2430fa81e446a00ec9c  54/README-54
 ```
