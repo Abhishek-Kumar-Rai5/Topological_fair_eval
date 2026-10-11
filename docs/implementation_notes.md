@@ -37,3 +37,26 @@ Prereg §4: "Delay embedding (m = 3, τ = 1). Vietoris–Rips persistence via `r
 | 15 | Infinite H0 bar | **Dropped everywhere**, including the Betti curve. All summaries use finite bars only. Zero-length bars are not reported by ripser. Std uses ddof = 0; entropy uses natural log; an empty diagram gives 0s | Every window has exactly one infinite H0 bar, so it carries no information |
 
 Feature sizes: F3 = 32; F1+F2+F3 = 266. Real-data check (machine-1-1 and machine-3-11): all values finite, about 1.2 ms per window, fit about 0.4 s per machine, H1 bars per window median 22 and 29. The training median distance is 3.9 and 5.6.
+
+**Std floor 0.01 (F3 choice 13): accepted by Anirudh, 2026-11-19.** It stays logged in `deviations_log.md`.
+
+## F5 Fluent Bit-style features (step 11, `src/features_fluentbit.py`) — exploratory
+
+Prereg §4: "Replicates the `tda` processor: log1p transform, embedding 3 × 1, a quantile radius scan that keeps the scale with maximum β1, then outputs β0, β1, β2 (3 features). **Exploratory**". Logic copied from `tda.c` at `25ea7e1` (see `docs/external_versions.md`), defaults kept (`embed_dim` 3, `embed_delay` 1, `min_points` 10, `threshold` 0 = automatic scan). Details in the module docstring. Only choices the C code does not settle are listed here:
+
+| # | Point | Our choice | Why |
+|---|---|---|---|
+| 16 | Input to the transform | **F5 replicates `tda.c` L561–569 literally: every metric is first-differenced** (`rate = (x_t − x_(t−1)) / dt`), then `sign(rate) · log1p(abs(rate))`. A 60-sample window gives 59 vectors → 57 embedded points. An earlier "gauges, no differencing" clarification was withdrawn before any results. Decided by Anirudh, 2026-11-19 | F5 exists to test the tool as shipped, so faithfulness to the code comes first. The code differences counters, gauges and untyped alike |
+| 17 | `dt` | **1 sample** (one time unit) | SMD has no timestamps. The 1-minute interval (a secondary-source value) would only rescale the rates; dt = 1 keeps F5 independent of it |
+| 18 | Feature groups | **One group per channel, D = 38** (the processor sums metrics into (namespace, subsystem) groups, about 8 in its docs). Confirmed by Anirudh, 2026-11-19 | SMD has no namespaces. Distances are over 38 × 3 = 114 dimensions, as in F3 |
+| 19 | What is counted as beta_k | **Finite bars with persistence ≥ 1e-3** per dimension, not infinite bars (the code's real behaviour; confirmed by Anirudh, 2026-11-19) | That is what the wrapper code does; its comment says the opposite. See `docs/code_verification.md` §4. The 1e-3 is absolute, and SMD values lie in [0, 1] |
+| 20 | Ripser | `ripser.py` (`ripser`, modulus 2) with `thresh` = the quantile distance and `maxdim` = 2; distances in float32, like the C code | Same algorithm as the bundled ripser 1.2.1. Not run against the C binary; checked on a hand-worked example (unit square) in `tests/test_features_fluentbit.py` |
+| 21 | Scaling | None (rates of the provider-scaled SMD values). Nothing is fitted | The processor fits nothing |
+
+Cost: about 39 ms per window (machine-1-1); about 1.5 hours single-threaded for all SMD windows. No random seed is involved.
+
+## CTU-13 (E4)
+
+- **Behaviour types: the label strings are not used** (they are traffic types: DNS, SPAM, CC1, HTTP-Ad, Binary-Download, not behaviours). Each scenario gets the type of its **README-listed** behaviours, and **Mixed** if they disagree. This is the prereg §2 fallback, so it is **not a deviation**. Decided by Anirudh, 2026-11-19.
+- **Infected hosts** = the IPs the README lists as `Label: Botnet`. Other IPs that send From-Botnet flows (scenarios 3 and 12) are not infected hosts. Confirmed by Anirudh, 2026-11-19.
+- E4 limitation (data fact, no rule change): see `deviations_log.md`.

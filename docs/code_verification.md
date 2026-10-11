@@ -1,4 +1,4 @@
-# Code-level verification: TAME, TopoGDN, MSF-IDS
+# Code-level verification: TAME, TopoGDN, MSF-IDS, Fluent Bit tda
 
 - **Method:** the public repositories were read at a fixed commit. No code was installed or run.
 - **Date:** 13 Nov 2026.
@@ -82,6 +82,18 @@
 ---
 
 **Note (tdaad @ `d103a2c`, 19 Nov 2026):** the README quickstart (`np.random.randn(1000, 3)`) fails with any gudhi version (tested 3.11.0 and 3.13.0), because tdaad uses the sensors as points and 3 sensors can't form an H1 loop, so Atol gets an empty H1 diagram; with 38 channels (SMD width) it runs.
+
+---
+
+## 4. Fluent Bit `tda` processor (@ `25ea7e1`, found 19 Nov 2026 while building F5)
+
+Not a re-test of a paper; a finding about what the processor outputs. Files: `tda.c`, `src/ripser/flb_ripser_wrapper.cpp`, `lib/ripser-1.2.1/ripser.cpp` (all at the pinned commit, copies in `external/fluent-bit/`).
+
+- **What the processor reports as `betti0/1/2` is not a Betti number.** The wrapper's comment (L70) says Betti_k is "the number of infinite bars in dimension k". Ripser emits an infinite bar with `death = -1` (`ripser.cpp` L618, L789), and the wrapper's callback returns early when `death <= birth` (`flb_ripser_wrapper.cpp` L90). So infinite bars are never counted. The code counts **finite** bars (death at or below the chosen threshold) whose persistence is at least `1e-3` (L96–97, an absolute constant, not scaled to the data).
+- **Consequence:** a loop that is still alive at the chosen distance threshold is not counted. The number is also in the units of the input (log1p of a rate), because of the absolute `1e-3` cut.
+- **Scale scan** (`tda.c` L807, L967–L995): nine quantiles (0.1–0.9) of the pairwise distances are tried; the scale with the most H1 bars wins, and only if no scale has H1 bars does the largest beta0 win. The reported (beta0, beta1, beta2) come from different scales for different windows.
+- **No evaluation** of any of this is published (PR fluent/fluent-bit#11250). Our F5 copies the code, not the comment (`src/features_fluentbit.py`).
+- Wording for the paper: "the released code counts finite bars above 1e-3, whereas its comment describes infinite bars".
 
 ---
 
