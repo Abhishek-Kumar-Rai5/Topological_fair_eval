@@ -4,6 +4,21 @@ Updated at the end of every task. Latest entry first.
 
 
 
+
+## 2026-11-20 (late night): Streamlit demo `app.py`
+
+**Done**
+- `app.py` (run: `streamlit run app.py`). Pages: Audit (Figures 1-2 and the 32 core papers, filterable), Code audit (`docs/code_verification.md`), E2 and E3 (tables, verdicts, per-machine Δ plot for the main and swap gains), E3x (H0 against H1), E4 (Z against Z-control, per-type cells under both typings), E5 and E5b (PR-AUC against magnitude with the chance line; E5 baseline-at-chance warning, E5b "counts" flags), Live (pick an SMD machine and window: 3-D PCA of the delay-embedded cloud, H0 and H1 diagrams, MST edge lengths against H0 deaths, F1+F2 and F1+F2+F3 scores).
+- Everything except the Live page reads existing files in `results/`, `literature/`, `docs/`. Live reads `data/SMD` (or `SMD_ROOT`) and fits on the machine's training windows only (seed 0, 1% false alarms on validation); the window's label is shown after scoring and never used.
+- MST check on real data: edge lengths equal the H0 deaths to float32 precision (largest difference about 1e-6).
+- Helpers: `src/app_helpers.py`, `src/live.py`. Tests: `tests/test_app.py` (14: every page renders, Live on toy data, MST = H0, core papers = 32, helpers). Server started and answered on a test port.
+
+**Next**
+- Fix the E4 runtime accounting; the report and slides.
+
+**Open decisions (Anirudh)**
+- Still open: TBD dates in `docs/decision_log.md`; `prereg-v3` tag on the remote; Step 4 self re-check.
+
 ## 2026-11-20 (night): E4, E4x, E3x run
 
 **Done** (commit `40641cd`, clean tree, `git_dirty` false in every sidecar)
