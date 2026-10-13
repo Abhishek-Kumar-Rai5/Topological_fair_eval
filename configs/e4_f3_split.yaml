@@ -1,0 +1,36 @@
+# E4x (EXPLORATORY, not in the prereg; logged in deviations_log.md): F3 split into its H0-only and H1-only halves,
+# same folds, seeds, detector and stage-1 tables as E4 (tables_from). Run: scripts/run_e4.py configs/e4_f3_split.yaml --stage 2 --out results/E4x
+experiment: E4x
+tables_from: results/E4
+dataset: CTU-13
+data_root: data/CTU-13
+windows:                          # §2: per host, from the flows that host sends
+  bin_seconds: 10
+  bins_per_window: 60             # 10 minutes
+  step_bins: 30
+labels:
+  positive: infected host AND >= 1 From-Botnet flow in the window
+  normal: labelled normal host AND >= 1 From-Normal flow AND no botnet flow
+  exclude_hosts: background-only
+split: {scheme: leave_one_scenario_out, validation: one other training scenario, drawn by seed}
+threshold: {false_alarm_rate: 0.01, on: validation}
+seeds: [0, 1, 2, 3, 4]
+detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}
+comparisons:
+  main_gain: {a: "F1+F2+F3", b: "F1+F2"}
+  zigzag: {a: "Z", b: "Z-control"}
+behaviours_file: configs/e4_behaviours.yaml   # scenario -> Shape / Volume / Mixed / Unknown (note 61)
+feature_sets: ["F1+F2", "F1+F2+F3", "F1+F2+F3-H0", "F1+F2+F3-H1"]
+behaviour_types:                  # §3
+  C&C: shape
+  Port scan: shape
+  P2P: shape
+  Spam: identity
+  Click fraud: volume
+  DDoS: volume
+metrics: [pr_auc, recall_at_thr, false_alarms_per_day, roc_auc, runtime_per_window]
+primary_metric: pr_auc
+bootstrap: {cluster: scenario, n_resamples: 2000, ci: 0.95}
+verdict: {equivalence_margin: 0.02, min_positive_windows: 20, min_normal_windows: 20}
+zigzag_timebox_days: 3            # fallback: per-window diagrams + Wasserstein between consecutive windows
+used_for: exploratory only (E4 stays the preregistered test)

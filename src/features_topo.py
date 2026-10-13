@@ -119,3 +119,29 @@ def f3_names(n_channels=None):
         names += [f"F3_{dim}_{s}" for s in STATS]
         names += [f"F3_{dim}_betti_{m:.1f}xmed" for m in BETTI_MULTIPLES]
     return names
+
+
+# ---- EXPLORATORY (E3x, E4x): F3 split into its two homology dimensions. Same fit, same features, half each.
+N_HALF = 16                                     # F3 = 16 H0 summaries, then 16 H1 summaries
+
+
+class F3H0Features(F3Features):
+    """Only the 16 H0 (connected components) summaries of F3."""
+
+    def transform(self, windows):
+        return super().transform(windows)[:, :N_HALF]
+
+
+class F3H1Features(F3Features):
+    """Only the 16 H1 (loops) summaries of F3."""
+
+    def transform(self, windows):
+        return super().transform(windows)[:, N_HALF:]
+
+
+def f3h0_names(n_channels=None):
+    return f3_names()[:N_HALF]
+
+
+def f3h1_names(n_channels=None):
+    return f3_names()[N_HALF:]

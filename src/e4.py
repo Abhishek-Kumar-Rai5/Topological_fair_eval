@@ -27,8 +27,11 @@ from src.threshold import threshold_at_fpr
 
 N_CH, SIZE = len(ctu13.CHANNELS), ctu13.WINDOW_BINS
 F1_EXTRA = ["F1_unique_dst_ip", "F1_unique_dst_port", "F1_flow_count", "F1_bytes", "F1_packets"]
-META = ["scenario", "host", "host_type", "window", "label", "n_edges_capped"]
+META = ["scenario", "host", "host_type", "window", "label", "n_edges_capped", "wtype"]
+WTYPES = ["Shape", "Identity", "Mixed", "Unnamed"]   # per-window types from the flow-label strings (note 61)
 SETS = ["F1+F2", "F1+F2+F3", "Z", "Z-control"]
+F3_SPLIT = ["F1+F2+F3-H0", "F1+F2+F3-H1"]      # EXPLORATORY (E4x): F3's H0-only and H1-only halves; the same fitted F3
+N_F3_HALF = 16                                   # F3 = 16 H0 summaries then 16 H1 summaries (src.features_topo)
 
 
 def feature_columns():
@@ -54,6 +57,7 @@ def host_rows(scenario, host, host_flows, is_infected, n_bins):
         extra = [wf["dst"].nunique(), wf["dport"].nunique(), len(wf), wf["bytes"].sum(), wf["pkts"].sum()]
         rows.append({"scenario": scenario, "host": host, "host_type": "infected" if is_infected else "normal",
                      "window": int(j), "label": label, "n_edges_capped": bool(capped[k]),
+                     "wtype": ctu13.window_type(wf) if label == 1 else "",
                      "_window": ctu13.channel_matrix(wf, j), "_extra": extra, "_graph": graphs[k], "_z": z[k]})
     return rows
 
@@ -113,8 +117,12 @@ def false_alarm_events(df_test, alarm):
     return total
 
 
-def run_fold(cfg, tables, test_scenario):
-    """All result rows (every seed, every feature set) for one held-out scenario."""
+def run_fold(cfg, tables, test_scenario, typed=False):
+    """All result rows (every seed, every feature set) for one held-out scenario.
+
+    typed=True also returns the per-type cells (note 61): for each window type T present among the scenario's
+    positives, the metrics on its T-positives plus ALL its normal windows (other positives left out).
+    """
     test = tables[test_scenario].reset_index(drop=True)
     cols = feature_columns()
     labels = test["label"].to_numpy()
@@ -125,7 +133,8 @@ def run_fold(cfg, tables, test_scenario):
     n_hosts = int(test.loc[test["host_type"] == "normal", "host"].nunique())
     fpr = cfg["threshold"]["false_alarm_rate"]
     det_cfg = cfg["detector"]
-    rows = []
+    rows, typed_rows = [], []
+    wt = test["wtype"].to_numpy()
     for seed in cfg["seeds"]:
         val_s = draw_validation(seed, test_scenario, scenarios)
         train_s = [s for s in scenarios if s not in (test_scenario, val_s)]
@@ -147,8 +156,11 @@ def run_fold(cfg, tables, test_scenario):
         fte = feats(test, windows_of(test))
         per_window_feat = (time.perf_counter() - t_test) / len(test)
         for X in (ftr, fva, fte):
-            X["F1+F2+F3"] = np.hstack([X["F1+F2"], X.pop("_F3")])
-        for name in SETS:
+            f3x = X.pop("_F3")
+            X["F1+F2+F3"] = np.hstack([X["F1+F2"], f3x])
+            X["F1+F2+F3-H0"] = np.hstack([X["F1+F2"], f3x[:, :N_F3_HALF]])          # exploratory only
+            X["F1+F2+F3-H1"] = np.hstack([X["F1+F2"], f3x[:, N_F3_HALF:]])
+        for name in cfg.get("feature_sets", SETS):
             det = IFDetector(seed, det_cfg["n_estimators"], det_cfg.get("max_samples", "auto")).fit(ftr[name])
             val_scores = det.score(fva[name])
             thr = threshold_at_fpr(val_scores, fpr)                                # validation only
@@ -159,16 +171,26 @@ def run_fold(cfg, tables, test_scenario):
             events = false_alarm_events(test, scores > thr)
             r["false_alarm_events"] = events
             r["false_alarms_per_day"] = events / days / max(n_hosts, 1) if days > 0 else float("nan")
-            rows.append({"experiment": cfg["experiment"], "machine": f"scenario-{test_scenario}", "scenario": test_scenario,
+            row = ({"experiment": cfg["experiment"], "machine": f"scenario-{test_scenario}", "scenario": test_scenario,
                          "seed": seed, "feature_set": name, "n_features": ftr[name].shape[1], "threshold": thr,
                          "validation_scenario": val_s, "n_train_windows": len(train), "n_val_windows": len(val),
                          "n_test_windows": len(test), "val_alarm_rate": float((val_scores > thr).mean()),
-                         "runtime_per_window_ms": 1000 * (secs + (per_window_feat if name in ("F1+F2", "F1+F2+F3") else 0)),
+                         "runtime_per_window_ms": 1000 * (secs + (per_window_feat if name.startswith("F1+F2") else 0)),
                          "fit_seconds": time.perf_counter() - t_fit, **r})
-    return pd.DataFrame(rows)
+            rows.append(row)
+            if typed:
+                for T in WTYPES:
+                    n_t = int((wt == T).sum())
+                    if n_t == 0:
+                        continue
+                    keep = (labels == 0) | (wt == T)
+                    rt = evaluate(scores[keep], labels[keep], thr, 1, 1.0)
+                    typed_rows.append({**row, "wtype": T, "pr_auc": rt["pr_auc"], "roc_auc": rt["roc_auc"],
+                                       "recall_at_thr": rt["recall_at_thr"], "n_positive": n_t, "n_normal": n_norm})
+    return (pd.DataFrame(rows), pd.DataFrame(typed_rows)) if typed else pd.DataFrame(rows)
 
 
-def load_tables(out_dir, scenarios):
+def load_tables(out_dir, scenarios):   # E4x passes cfg["tables_from"] = results/E4 here
     """Read the stage-1 tables (each must be valid) and attach the scenario length from its sidecar."""
     import json
     tables = {}
@@ -182,9 +204,10 @@ def load_tables(out_dir, scenarios):
 
 
 def run_fold_and_save(cfg, tables, test_scenario, out_dir):
-    df = run_fold(cfg, tables, test_scenario)
+    df, typed = run_fold(cfg, tables, test_scenario, typed=True)
     meta = run_metadata(seed=list(cfg["seeds"]), config=cfg, extra={"scenario": test_scenario})
-    save_result(df, Path(out_dir) / "by_fold" / f"{test_scenario}.csv", meta)
+    save_result(typed, Path(out_dir) / "by_fold" / f"{test_scenario}_wtype.csv", meta)
+    save_result(df, Path(out_dir) / "by_fold" / f"{test_scenario}.csv", meta)        # written last: marks the fold done
     return df
 
 
@@ -192,6 +215,9 @@ def merge_results(cfg, scenarios, out_dir):
     out_dir = Path(out_dir)
     df = pd.concat([pd.read_csv(out_dir / "by_fold" / f"{s}.csv") for s in scenarios], ignore_index=True)
     meta = run_metadata(seed=list(cfg["seeds"]), config=cfg, extra={"scenarios": list(scenarios)})
+    typed = [pd.read_csv(out_dir / "by_fold" / f"{s}_wtype.csv") for s in scenarios if (out_dir / "by_fold" / f"{s}_wtype.csv").exists()]
+    if typed:
+        save_result(pd.concat(typed, ignore_index=True), out_dir / f"{cfg['experiment']}_wtype_results.csv", meta)
     return save_result(df, out_dir / f"{cfg['experiment']}_results.csv", meta)
 
 

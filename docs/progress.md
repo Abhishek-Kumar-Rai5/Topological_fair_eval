@@ -2,6 +2,18 @@
 
 Updated at the end of every task. Latest entry first.
 
+
+## 2026-11-20 (late): E4 typing by flow-label strings, E4x and E3x built (not run)
+
+**Done**
+- **Primary E4 typing = per positive window from the flow-label strings** (prereg §2 first rule): `CC<n>`, `P2P` = Shape, `SPAM` = Identity, several = Mixed, none = Unnamed (note 61, note 67). **Sensitivity typing** = README then Table 2 per scenario (IRC = C&C, HTTP not counted): Shape S3, S6, S8, S12; Mixed S1, S2, S4, S5, S7, S9, S11, S13; no Volume-only (data limitation). S7 stays Mixed (README wins; conflict in note 61). The strings cannot name port scan, DDoS or click fraud, so neither typing can test P2 and neither decides a prediction.
+- Exploratory **E4x** (CTU-13) and **E3x** (SMD): F3 split into H0-only and H1-only (note 68, logged in `deviations_log.md`). `src/features_topo.py`, `src/feature_sets.py` (groups `F3-H0`, `F3-H1`), `src/e4.py`, `configs/e3x_f3_split.yaml`, `configs/e4_f3_split.yaml`, `scripts/summarize_e3x.py`, `scripts/summarize_e4x.py`. 138 tests pass. Nothing run yet.
+
+**Next** (after your commit): E4 (`scripts/run_e4.py configs/e4_ctu13.yaml --jobs 4 --resume`, `scripts/summarize_e4.py results/E4`), then E4x (`--stage 2 ... --out results/E4x`, `scripts/summarize_e4x.py`), then E3x (`scripts/run_experiment.py configs/e3x_f3_split.yaml --jobs 4 --resume`, `scripts/summarize_e3x.py results/E3x`).
+
+**Open decisions (Anirudh)**
+- None new. Still open: TBD dates in `docs/decision_log.md`; `prereg-v3` tag on the remote; Step 4 self re-check.
+
 ## 2026-11-20: E4 on CTU-13 built (worktree `dev`; nothing run beyond one dry run)
 
 **Done**

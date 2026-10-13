@@ -1,0 +1,21 @@
+# E3x (EXPLORATORY, not in the prereg; logged in deviations_log.md): F3 split into its H0-only and H1-only halves on SMD,
+# against F1+F2, with the same seeds, windows, detector, threshold and rules as E3.
+experiment: E3x
+dataset: SMD
+data_root: data/SMD
+windows: {size: 60, step: 10, label_tail: 10}
+split: {val_frac: 0.2}
+threshold: {false_alarm_rate: 0.01, on: validation}
+seeds: [0, 1, 2, 3, 4]
+minutes_per_point: 1.0
+detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}
+feature_sets: ["F1+F2", "F1+F2+F3", "F1+F2+F3-H0", "F1+F2+F3-H1"]   # exploratory; the first two repeat E3
+comparisons:                                                # exploratory, no prereg verdict
+  h0_gain: {a: "F1+F2+F3-H0", b: "F1+F2"}
+  h1_gain: {a: "F1+F2+F3-H1", b: "F1+F2"}
+metrics: [pr_auc, recall_at_thr, false_alarms_per_day, roc_auc, runtime_per_window]
+primary_metric: pr_auc
+point_adjustment: false
+reporting: overall_only
+bootstrap: {cluster: machine, n_resamples: 2000, ci: 0.95}
+verdict: {equivalence_margin: 0.02, min_positive_windows: 20, min_normal_windows: 20}  # §8

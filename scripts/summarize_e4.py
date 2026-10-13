@@ -4,9 +4,13 @@
 
 Reuses scripts/summarize_smd.py (merged from master): per feature set PR-AUC, ROC-AUC, recall and false alarms per
 normal host-day, each with a 95% cluster bootstrap CI over scenarios; and the Helps / No added value / Inconclusive
-rule for  Δ = F1+F2+F3 - F1+F2  and  Δz = Z - Z-control.  Also per behaviour type (configs/e4_behaviours.yaml).
-Writes E4_summary.csv, E4_verdicts.csv, E4_by_type.csv next to the results (with .meta.json).
-Type cells have 2 scenarios each at most (Shape: 8, 12; Volume: 4, 11), so their CIs are very wide.
+rule for  Δ = F1+F2+F3 - F1+F2  and  Δz = Z - Z-control.  Also per behaviour type, two ways (note 61):
+  PRIMARY    per window, from the behaviours its botnet flows NAME in their label strings (prereg §2 first rule):
+             CC<n> and P2P = Shape, SPAM = Identity, more than one type = Mixed, nothing named = Unnamed.
+             A cell = the T-positives plus all normal windows (E4_wtype_results.csv).
+  SENSITIVITY per scenario, from the README / Table 2 typing (configs/e4_behaviours.yaml).
+Neither typing can test P2: the strings never name port scan, DDoS or click fraud. Neither decides a prediction.
+Writes E4_summary.csv, E4_verdicts.csv, E4_by_wtype.csv (primary), E4_by_type.csv (sensitivity) with .meta.json.
 """
 import argparse
 import sys
@@ -45,6 +49,15 @@ def by_type(df, types, seed):
     return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
 
 
+def by_wtype(df_w, seed):
+    """Primary typing: one cell per window type, positives of that type against all normal windows."""
+    out = []
+    for t, g in df_w.groupby("wtype"):
+        _, v, pos = verdict_table(g, seed, {"wtype": t, "n_scenarios": len(smd.machines_with_positives(g))})
+        out.append(v)
+    return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("folder")
@@ -56,12 +69,16 @@ def main():
     types = {int(k): v["type"] for k, v in yaml.safe_load(Path(cfg["behaviours_file"]).read_text())["scenarios"].items()}
     summary, verdicts, pos = verdict_table(df, args.seed)
     typed = by_type(df, types, args.seed)
+    wpath = folder / "E4_wtype_results.csv"
+    wtyped = by_wtype(pd.read_csv(wpath), args.seed) if wpath.exists() else pd.DataFrame()
     meta = run_metadata(seed={"model_seeds": cfg["seeds"], "bootstrap_seed": args.seed}, config=cfg,
                         extra={"source": "E4_results.csv", "bootstrap": smd.BOOT})
     save_result(summary, folder / "E4_summary.csv", meta)
     save_result(verdicts, folder / "E4_verdicts.csv", meta)
     if len(typed):
         save_result(typed, folder / "E4_by_type.csv", meta)
+    if len(wtyped):
+        save_result(wtyped, folder / "E4_by_wtype.csv", meta)
     pd.set_option("display.width", 250, "display.max_columns", 30)
     print(f"\nE4: {df.scenario.nunique()} test scenarios, {len(pos)} with positives\n")
     t = summary.copy()
@@ -69,8 +86,11 @@ def main():
         t[m] = [f"{r[m]:.3f} [{r[m + '_lo']:.3f}, {r[m + '_hi']:.3f}]" for _, r in summary.iterrows()]
     print(t[["feature_set", "pr_auc", "roc_auc", "recall_at_thr", "false_alarms_per_day"]].to_string(index=False))
     print("\n", verdicts.round(4).to_string(index=False))
+    if len(wtyped):
+        print("\nPRIMARY: BY WINDOW TYPE FROM THE FLOW-LABEL STRINGS (positives of the type vs all normal windows):\n",
+              wtyped.round(4).to_string(index=False))
     if len(typed):
-        print("\nBY BEHAVIOUR TYPE (README fallback; Unknown scenarios are left out):\n", typed.round(4).to_string(index=False))
+        print("\nSENSITIVITY: BY SCENARIO TYPE FROM README / TABLE 2:\n", typed.round(4).to_string(index=False))
 
 
 if __name__ == "__main__":

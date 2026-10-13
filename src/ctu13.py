@@ -29,6 +29,27 @@ def label_class(label):
     return "-".join(tokens[:2]) if tokens[0] in ("From", "To") else tokens[0]
 
 
+SHAPE_BIT, IDENTITY_BIT = 1, 2
+
+
+def behaviour_code(label):
+    """Behaviours a flow-label string NAMES (prereg §2 first rule, §3 mapping): 1 = shape, 2 = identity, 0 = none.
+
+    Tokens of 'flow=From-Botnet-V42-TCP-CC6-Plain-HTTP-...': CC<n> (a C&C channel) and P2P are Shape, SPAM is Identity.
+    The strings never name port scan, DDoS or click fraud, so those cannot be typed from them.
+    """
+    toks = str(label).removeprefix("flow=").split("-")
+    shape = any(re.fullmatch(r"CC\d*", t) or t == "P2P" for t in toks)
+    return (SHAPE_BIT if shape else 0) | (IDENTITY_BIT if "SPAM" in toks else 0)
+
+
+def window_type(wf):
+    """Type of a positive window from the botnet flows it contains: Shape, Identity, Mixed, or Unnamed."""
+    code = wf.loc[wf["cls"] == "From-Botnet", "beh"].to_numpy(int)
+    shape, ident = bool((code & SHAPE_BIT).any()), bool((code & IDENTITY_BIT).any())
+    return "Mixed" if shape and ident else "Shape" if shape else "Identity" if ident else "Unnamed"
+
+
 def infected_ips(folder):
     """IPs the README lists as 'IP: x (Label: Botnet)'."""
     files = glob.glob(str(Path(folder) / "README*"))
@@ -85,7 +106,8 @@ def read_scenario(folder, infected=None):
         "bin": ((t - t0).dt.total_seconds() // BIN_SECONDS).astype(int).to_numpy(),
         "dst": df["DstAddr"].fillna("?").to_numpy(), "dport": df["Dport"].fillna("?").to_numpy(),
         "pkts": df["TotPkts"].to_numpy(float), "bytes": df["TotBytes"].to_numpy(float),
-        "src_bytes": df["SrcBytes"].to_numpy(float), "cls": df["Label"].fillna("").map(label_class).to_numpy()})
+        "src_bytes": df["SrcBytes"].to_numpy(float), "cls": df["Label"].fillna("").map(label_class).to_numpy(),
+        "beh": df["Label"].fillna("").map({l: behaviour_code(l) for l in df["Label"].fillna("").unique()}).to_numpy(int)})
     return Scenario(flows.sort_values(["host", "bin"], kind="stable").reset_index(drop=True), infected, normal, n_bins, t0)
 
 

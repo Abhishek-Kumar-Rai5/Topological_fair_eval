@@ -223,3 +223,84 @@ def test_summary_script_on_toy_results():
     assert len(summary) == 4 and len(pos) == 8
     z = v[v.comparison == "Z - Z-control"].iloc[0]
     assert z.verdict == "Helps" and z.delta_pr_auc > 0.05
+
+
+def test_f3_split_sets_are_the_halves_of_the_same_f3(built):
+    """E4x (exploratory): H0-only and H1-only add 16 columns each to F1+F2; the full F3 adds 32; E4 itself is unchanged."""
+    c, out = built
+    tables = e4.load_tables(out, [1, 2, 3, 4])
+    cfg = dict(c, feature_sets=["F1+F2", "F1+F2+F3", "F1+F2+F3-H0", "F1+F2+F3-H1"])
+    df = e4.run_fold(cfg, tables, 1)
+    n = df.groupby("feature_set").n_features.first()
+    assert n["F1+F2+F3-H0"] == n["F1+F2"] + 16 and n["F1+F2+F3-H1"] == n["F1+F2"] + 16 and n["F1+F2+F3"] == n["F1+F2"] + 32
+    base = e4.run_fold(c, tables, 1)                                       # the E4 sets alone
+    a = df[df.feature_set == "F1+F2+F3"].sort_values("seed").pr_auc.to_numpy()
+    b = base[base.feature_set == "F1+F2+F3"].sort_values("seed").pr_auc.to_numpy()
+    assert np.allclose(a, b)                                               # adding the split changes nothing in E4
+
+
+def test_e4x_summary_script_on_toy_results():
+    sys.path.insert(0, "scripts")
+    pytest.importorskip("summarize_smd")
+    import summarize_e4x as sx
+    assert ("F1+F2+F3-H1", "F1+F2+F3-H0") in sx.COMPARISONS
+
+
+def test_flow_label_strings_name_behaviours():
+    code = ctu13.behaviour_code
+    assert code("flow=From-Botnet-V42-TCP-CC6-Plain-HTTP-Encrypted-Data") == ctu13.SHAPE_BIT
+    assert code("flow=From-Botnet-V42-UDP-CC108-Established-P2P-Not-Encrypted-1") == ctu13.SHAPE_BIT
+    assert code("flow=From-Botnet-V42-TCP-Attempt-SPAM") == ctu13.IDENTITY_BIT
+    assert code("flow=From-Botnet-V42-UDP-DNS") == 0 and code("flow=Background-TCP-Attempt") == 0
+    assert code("flow=From-Botnet-V50-1-UDP-DNS") == 0                    # a '1' alone is not C&C
+    assert code("flow=From-Botnet-V42-TCP-Established-HTTP-Ad-5") == 0    # ad traffic is not named click fraud
+
+
+def test_window_type_from_the_botnet_flows_of_the_window():
+    def wf(cls_beh):
+        return pd.DataFrame({"cls": [c for c, _ in cls_beh], "beh": [b for _, b in cls_beh]})
+    S, I = ctu13.SHAPE_BIT, ctu13.IDENTITY_BIT
+    assert ctu13.window_type(wf([("From-Botnet", S), ("From-Botnet", 0)])) == "Shape"
+    assert ctu13.window_type(wf([("From-Botnet", I)])) == "Identity"
+    assert ctu13.window_type(wf([("From-Botnet", S), ("From-Botnet", I)])) == "Mixed"
+    assert ctu13.window_type(wf([("From-Botnet", S | I)])) == "Mixed"
+    assert ctu13.window_type(wf([("From-Botnet", 0), ("From-Normal", S)])) == "Unnamed"   # only botnet flows count
+
+
+def test_typed_cells_use_type_positives_and_all_normals(built):
+    c, out = built
+    tables = e4.load_tables(out, [1, 2, 3, 4])
+    df, typed = e4.run_fold(c, tables, 1, typed=True)
+    assert set(typed.wtype) <= set(e4.WTYPES) and len(typed) > 0
+    t1 = tables[1]
+    n_norm = int((t1.label == 0).sum())
+    for T, g in typed.groupby("wtype"):
+        assert (g.n_positive == int((t1.wtype == T).sum())).all() and (g.n_normal == n_norm).all()
+    assert set(t1.loc[t1.label == 1, "wtype"]) <= set(e4.WTYPES) and (t1.loc[t1.label == 0, "wtype"] == "").all()
+    for col in ("false_alarms_per_day", "runtime_per_window_ms", "val_alarm_rate"):   # same fold rows, so same values
+        assert typed[col].notna().all()
+
+
+def test_f3_halves_for_e3x():
+    from src.feature_sets import FeatureSet
+    rng = np.random.default_rng(0)
+    train, test = rng.normal(size=(20, 60, 4)), rng.normal(size=(4, 60, 4))
+    full = FeatureSet("F3").fit(train).transform(test)
+    h0, h1 = FeatureSet("F3-H0").fit(train).transform(test), FeatureSet("F3-H1").fit(train).transform(test)
+    assert h0.shape == (4, 16) and h1.shape == (4, 16)
+    assert np.allclose(np.hstack([h0, h1]), full)
+    assert FeatureSet("F1+F2+F3-H0").fit(train).names()[-16:] == FeatureSet("F3").fit(train).names()[:16]
+
+
+def test_summary_by_window_type_on_toy_results():
+    sys.path.insert(0, "scripts")
+    pytest.importorskip("summarize_smd")
+    import summarize_e4 as s4
+    rng = np.random.default_rng(1)
+    rows = [{"machine": f"scenario-{s}", "scenario": s, "seed": sd, "feature_set": fs, "wtype": t,
+             "pr_auc": 0.5 + rng.normal(0, .01), "roc_auc": .8, "recall_at_thr": .5, "false_alarms_per_day": 1.,
+             "runtime_per_window_ms": 1., "val_alarm_rate": .01, "n_positive": 12, "n_normal": 100}
+            for s in range(1, 9) for sd in (0, 1) for fs in e4.SETS for t in ("Shape", "Mixed")]
+    v = s4.by_wtype(pd.DataFrame(rows), 0)
+    assert set(v.wtype) == {"Shape", "Mixed"} and (v.n_scenarios == 8).all()
+    assert (v.pooled_positive_windows == 96).all()                          # 8 scenarios x 12

@@ -11,7 +11,7 @@ import numpy as np
 
 from src.features_simple import F2Features, f1_features, f1_names, f2_names
 from src.features_fluentbit import F5Features, f5_names
-from src.features_topo import F3Features, f3_names
+from src.features_topo import F3Features, F3H0Features, F3H1Features, f3_names, f3h0_names, f3h1_names
 
 
 class _F1:
@@ -23,7 +23,9 @@ class _F1:
 
 
 GROUPS = {"F1": (_F1, f1_names), "F2": (F2Features, f2_names), "F3": (F3Features, f3_names),
-          "F5": (F5Features, f5_names)}
+          "F5": (F5Features, f5_names),
+          "F3-H0": (F3H0Features, f3h0_names),      # exploratory (E3x): F3's H0 half only
+          "F3-H1": (F3H1Features, f3h1_names)}      # exploratory (E3x): F3's H1 half only
 
 
 class FeatureSet:

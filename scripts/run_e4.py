@@ -26,7 +26,7 @@ from src.metadata import is_valid_result
 
 
 def stage2_job(cfg, scenarios, s, out_dir):
-    tables = e4.load_tables(out_dir, scenarios)
+    tables = e4.load_tables(cfg.get("tables_from", out_dir), scenarios)
     e4.run_fold_and_save(cfg, tables, s, out_dir)
     return s
 
@@ -60,7 +60,7 @@ def main():
         print(f"stage 1: {len(todo)} of {len(scenarios)} scenarios to build", flush=True)
         run_pool(e4.build_scenario, args.jobs, [(cfg, s, out) for s in todo], "scenario")
     if args.stage in ("2", "both"):
-        tables = e4.load_tables(out, scenarios)
+        tables = e4.load_tables(cfg.get("tables_from", out), scenarios)   # E4x reuses the stage-1 tables of E4
         folds = [s for s in scenarios if (tables[s]["label"] == 1).any() and (tables[s]["label"] == 0).any()]
         skipped = sorted(set(scenarios) - set(folds))
         if skipped:

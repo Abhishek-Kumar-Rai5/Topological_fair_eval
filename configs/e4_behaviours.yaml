@@ -1,18 +1,24 @@
-# E4 scenario behaviour types (prereg §2 README fallback; implementation note 61). NEEDS ANIRUDH'S CONFIRMATION.
-# Type of each scenario = the type of the behaviours its README names (prereg §3 table:
-# C&C, port scan, P2P = Shape; spam = Identity; click fraud, DDoS = Volume); Mixed if they disagree;
-# Unknown if the README names no behaviour (those scenarios count in the overall result only).
-# Scenario 10 has no .binetflow and is not used.
+# E4 scenario behaviour types = the SENSITIVITY typing (implementation note 61). The PRIMARY typing is per window, from the
+# behaviours named in the flow-label strings (note 61, note 67); it does not use this file.
+# (prereg §2 fallback; rules confirmed by Anirudh 2026-11-20).
+# Type of a scenario = the type of the behaviours it lists, Mixed if they disagree (prereg §3 mapping:
+# C&C, port scan, P2P = Shape; spam = Identity; click fraud, DDoS = Volume).
+# Sources: the scenario README is PRIMARY; Table 2 of the official CTU-13 page
+# (https://www.stratosphereips.org/datasets-ctu13) only fills READMEs that are silent, and adds the IRC column.
+# Table 2 columns: SPAM = spam, CF = click fraud, PS = port scan, DDoS, P2P count as in §3; IRC = a C&C channel,
+# so it counts as C&C (Shape), as instructed. HTTP is NOT counted: Table 2's caption defines only CF, PS, FF and
+# US, not "C&C over HTTP". FF (fast-flux) and US (compiled by the CTU team) are not behaviours.
+# Scenario 10 has no .binetflow and is not used. No scenario is Volume-only (data limitation, see note 61).
 scenarios:
-  1:  {type: Mixed,   evidence: "README-42: spam (identity) + HTTP C&C (shape) + click fraud (volume)"}
-  2:  {type: Unknown, evidence: "README-43 names no behaviour"}
-  3:  {type: Unknown, evidence: "README-44 names no behaviour"}
-  4:  {type: Volume,  evidence: "README-45: UDP DoS and SYN flood commands"}
-  5:  {type: Unknown, evidence: "README-46 names no behaviour (fast-flux)"}
-  6:  {type: Unknown, evidence: "README-47 names no behaviour"}
-  7:  {type: Mixed,   evidence: "README-48: spam (identity) + IRC + click fraud (volume)"}
-  8:  {type: Shape,   evidence: "README-49: C&C to china hosts"}
-  9:  {type: Unknown, evidence: "README-50 names no behaviour"}
-  11: {type: Volume,  evidence: "README-52: ICMP DoS by an IRC botnet"}
-  12: {type: Shape,   evidence: "README-53: P2P protocol"}
-  13: {type: Unknown, evidence: "README-54 names no behaviour (fast-flux)"}
+  1:  {type: Mixed, evidence: "README-42: spam (identity) + HTTP C&C (shape) + click fraud (volume); Table 2: IRC, SPAM, CF"}
+  2:  {type: Mixed, evidence: "README-43 silent; Table 2: IRC = C&C (shape) + SPAM (identity) + CF (volume)"}
+  3:  {type: Shape, evidence: "README-44 mentions IRC only; Table 2: IRC = C&C (shape) + PS (shape); US not counted"}
+  4:  {type: Mixed, evidence: "README-45: UDP/SYN DoS commands (volume) over IRC = C&C (shape); Table 2: IRC, DDoS, US"}
+  5:  {type: Mixed, evidence: "README-46 silent; Table 2: SPAM (identity) + PS (shape); HTTP not counted"}
+  6:  {type: Shape, evidence: "README-47 silent; Table 2: PS (shape) only"}
+  7:  {type: Mixed, evidence: "README-48 (primary): spam (identity) + IRC = C&C (shape) + click fraud (volume). CONFLICT: Table 2 lists only HTTP (not counted), which would give no behaviour; the README wins"}
+  8:  {type: Shape, evidence: "README-49: C&C (shape); Table 2: PS (shape)"}
+  9:  {type: Mixed, evidence: "README-50 silent; Table 2: IRC = C&C (shape) + SPAM (identity) + CF (volume) + PS (shape)"}
+  11: {type: Mixed, evidence: "README-52: ICMP DoS (volume) by an IRC botnet = C&C (shape); Table 2: IRC, DDoS, US"}
+  12: {type: Shape, evidence: "README-53: P2P (shape); Table 2: P2P"}
+  13: {type: Mixed, evidence: "README-54 silent; Table 2: SPAM (identity) + PS (shape); HTTP not counted"}
