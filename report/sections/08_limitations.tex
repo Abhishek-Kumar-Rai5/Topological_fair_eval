@@ -1,0 +1,32 @@
+\section{Limitations and future work}
+\label{sec:limits}
+
+\fillin{Draft: extend with anything the experiments reveal.}
+
+\paragraph{Audit.}
+\begin{itemize}
+  \item One person coded the papers, with AI assistance. Reliability is estimated only by a blind re-score of 7 papers.
+  \item Eight core papers could be read only as abstracts.
+  \item The search for earlier critical reviews was not completed.
+\end{itemize}
+
+\paragraph{Data.}
+\begin{itemize}
+  \item SMD has no anomaly types, so E2 and E3 give overall results only, and the shape-versus-volume question rests on injections. SMD is also open to the benchmark critiques in~\cite{Q04}. We use it because most TDA papers do, which lets us compare with them directly.
+  \item CTU-13 has only 7 distinct normal hosts, 4 of which appear in every scenario. One scenario (10) lacks flow labels. E4 is therefore supporting evidence only.
+\end{itemize}
+
+\paragraph{Design.}
+\begin{itemize}
+  \item E5 is a mechanism test by design. Shape injections keep each channel's mean and variance, and volume injections keep the coupling between channels. It shows what each feature set \emph{can} detect, not how often such anomalies occur in practice.
+  \item We use one detector with fixed defaults. Another detector might use topological features differently.
+  \item F3 is one reasonable, untuned topology pipeline. A negative result for F3 is not a negative result for every possible topological method.
+\end{itemize}
+
+\paragraph{Future work.}
+\begin{itemize}
+  \item Test against an adversary who knows the features; no paper does (R9).
+  \item Replicate I03 on DARPA OpTC with its original hypergraph construction.
+  \item Run analyst studies for the exploratory uses (Mapper, motifs), which detection metrics do not capture.
+  \item Measure streaming cost at realistic event rates, for Fluent Bit-style deployments.
+\end{itemize}

@@ -58,9 +58,9 @@ bx.invert_yaxis(); bx.set_xlim(0, ci.sum(axis=1).max() + 4.5); bx.set_xlabel("Fu
 bx.set_title("(b) Same outcomes by how topology was isolated", fontsize=9.5)
 bx.spines[["top","right"]].set_visible(False)
 fig.text(.01, .01, f"Core: {n} papers ({n_full} full text, {n-n_full} abstract only). Excluded: boundary rows, J06; D05 merged into D02; B10 held as candidate (inclusion unverified). "
-         "D03 excluded (Mapper described, no output shown).\n'Claimed, unverified' = outcome known only from abstract or repository (D02: repo numbers, paper unread). "
+         "D03 excluded (Mapper described, no output shown).\n'Claimed, unverified' = outcome known only from abstract or repository (D02: repo numbers, paper unread).\n"
          "Panel (b): only Replacement isolates topology; I03's win is weak (one host, no detection metric); C02's comparison appears invalid.", fontsize=7.2, va="bottom")
-fig.subplots_adjust(left=.05, right=.98, top=.92, bottom=.27, wspace=.25)
+fig.subplots_adjust(left=.05, right=.98, top=.92, bottom=.29, wspace=.25)
 for e in ("pdf", "png"): fig.savefig(f"{out}/fig1_evidence_map.{e}", dpi=300)
 
 # ---- Fig 2: rigor heatmap

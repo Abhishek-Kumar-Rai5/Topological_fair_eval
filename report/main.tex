@@ -1,0 +1,93 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---------- packages ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs,tabularx,longtable,array,multirow}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}{../literature/figures/}} % figures/ only needed on Overleaf
+\setlist{nosep,leftmargin=*}
+\setlength{\emergencystretch}{2em}
+\captionsetup{font=small,labelfont=bf}
+\renewcommand{\arraystretch}{1.15}
+
+% ---------- project macros ----------
+% Red placeholder: everything still to be filled in or checked.
+\newcommand{\fillin}[1]{\textcolor{red}{[\textbf{TODO:} #1]}}
+% Result that only exists after a run.
+\newcommand{\pending}{\textcolor{red}{\textbf{[pending]}}}
+% Record ID with its citation, e.g. \rec{C01} -> C01 [12].
+\newcommand{\rec}[1]{#1~\citep{#1}}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\hypersetup{pdftitle={Does Topology Help? An Audit and Fair Re-evaluation of TDA Anomaly Detection for Systems and Security Telemetry}}
+
+\begin{document}
+
+% ---------- cover page ----------
+\begin{titlepage}
+  \centering
+  \vspace*{1.5cm}
+  {\Large \fillin{Institute name}\par}
+  \vspace{0.3cm}
+  {\large \fillin{Department}\par}
+  \vspace{2cm}
+  {\LARGE\bfseries Does Topology Help?\par}
+  \vspace{0.4cm}
+  {\Large An Audit and Fair Re-evaluation of Topological Data Analysis\\
+  Anomaly Detection for Systems and Security Telemetry\par}
+  \vspace{2cm}
+  {\large Semester project report\par}
+  \vspace{1.5cm}
+  \begin{tabular}{rl}
+    Submitted by: & Anirudh \fillin{full name} \\
+    Roll number:  & \fillin{roll no.} \\
+    Programme:    & \fillin{course and semester} \\
+    Supervisor:   & \fillin{name, designation} \\
+  \end{tabular}
+  \vfill
+  {\large \fillin{month} 2026\par}
+\end{titlepage}
+
+\begin{abstract}
+\noindent
+Topological data analysis (TDA) is increasingly proposed for anomaly detection on network, host and server telemetry. The usual argument is that topology captures ``shape'' that simple statistics miss. We test whether the published evidence supports that argument, and then test the argument ourselves.
+First, we audit 95 records, of which 32 are core applications, against a 13-item rigour rubric. Only 4 of the 32 papers compare topology fairly, by swapping it for cheap features under the same data, split and detector: two lose, one ties and one shows a weak win. None tests against an adversary.
+Second, we read the released code of six projects at pinned commits. Three of them use test information when choosing thresholds, detectors or training stops. One assigns random timestamps that then serve as the persistence filtration. A topology processor shipped in Fluent Bit does not count what its comment says it counts.
+Third, we re-evaluate the claims under a preregistered protocol on SMD and CTU-13. On SMD, adding topological features to the same detector raises PR-AUC by 0.054 [0.035, 0.076], at about 1.6\,ms per window. \fillin{E1, E2, E4 and E5 results; the shape-versus-volume answer}.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_method}
+\input{sections/04_audit}
+\input{sections/05_code_audit}
+\input{sections/06_experiments}
+\input{sections/07_why}
+\input{sections/08_limitations}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references,records}
+
+\appendix
+\input{sections/A_appendix}
+
+\end{document}
