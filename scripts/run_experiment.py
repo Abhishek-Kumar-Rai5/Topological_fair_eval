@@ -50,6 +50,9 @@ def main():
     elif cfg["experiment"] == "E5":                       # injections: own runner (src/e5.py)
         from src import e5
         run_one, merge = e5.run_machine_and_save, e5.merge_results
+    elif cfg["experiment"] == "E5b":                      # exploratory: k channels per injection (src/e5b.py)
+        from src import e5b
+        run_one, merge = e5b.run_machine_and_save, e5b.merge_results
     else:
         pipeline_spec(cfg)                              # fail early if this runner can't do the config
         run_one, merge = run_machine_and_save, merge_results

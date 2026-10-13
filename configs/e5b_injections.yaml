@@ -1,0 +1,36 @@
+# E5b (EXPLORATORY, not in the prereg; logged in deviations_log.md): E5 with K = 5 channels per injection, the same K for every type.
+# A cell counts only if the F1+F2 baseline ROC-AUC is at least 0.7. P1 and P2 are NOT decided from E5b.
+experiment: E5b
+dataset: SMD
+data_root: data/SMD
+windows: {size: 60, step: 10, label_tail: 10}
+split: {val_frac: 0.2}
+threshold: {false_alarm_rate: 0.01, on: validation}
+seeds: [0, 1, 2, 3, 4]
+minutes_per_point: 1.0
+detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}
+injection:
+  k: 5                                 # channels touched by every injection, same for every type
+  into: normal test segments only     # training and validation never touched
+  duration: 60
+  per_type_magnitude_machine: 10
+  min_spacing: 120                    # and never touching labelled anomalies
+  eligibility:                        # chosen from training data
+    periodic: {acf_at_dominant_lag_gt: 0.5}
+    coupled_pair: {abs_corr_gt: 0.7}
+  types:
+    S1: {kind: shape,  what: period change by resampling,       magnitudes: [1.5, 2, 3],       decision: 2}
+    S2: {kind: shape,  what: phase shift of one coupled channel, magnitudes: [0.125, 0.25, 0.5], decision: 0.25}   # fraction of period
+    S3: {kind: shape,  what: correlation break (same-channel random segment), magnitudes: [0.5, 0.75, 1.0], decision: 1.0}
+    V1: {kind: volume, what: level shift (sigma),               magnitudes: [1, 2, 3],         decision: 2}
+    V2: {kind: volume, what: spikes, 3 points (sigma),          magnitudes: [3, 5, 8],         decision: 5}
+    V3: {kind: volume, what: variance scaling,                  magnitudes: [1.5, 2, 3],       decision: 2}
+comparisons:
+  main_gain: {a: "F1+F2+F3", b: "F1+F2"}
+metrics: [pr_auc, recall_at_thr, false_alarms_per_day, roc_auc]
+primary_metric: pr_auc
+bootstrap: {cluster: machine, n_resamples: 2000, ci: 0.95}
+verdict: {equivalence_margin: 0.02, min_positive_windows: 20, min_normal_windows: 20, p2_bonferroni_alpha: 0.0166667}
+used_for: exploratory only (E5 stays the preregistered test)
+min_baseline_roc_auc: 0.7              # a cell counts only if the F1+F2 ROC-AUC (mean over machines) reaches this
+skip_rule: machines with fewer than k usable channels for a type are skipped for that type and listed in E5b_placement.csv
