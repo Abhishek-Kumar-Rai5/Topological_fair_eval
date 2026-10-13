@@ -80,7 +80,7 @@
 - **PHANTOM** @ `8caa25a`:
   - BSD licence.
   - Ripser H0 only.
-  - Scores with the bottleneck distance between the baseline diagram and the baseline plus the new window, with a rolling baseline update.
+  - Scores with the Wasserstein distance (`main.py` calls `compare(..., 2)`) between the baseline diagram and the baseline plus the new window, with a rolling baseline update. (`AnomalyScore.compare` defaults to bottleneck, but `main.py` never uses the default.)
 - **Fluent Bit `tda` processor:**
   - Metrics only.
   - Transform: sign·log1p.

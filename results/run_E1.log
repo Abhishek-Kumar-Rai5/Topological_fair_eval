@@ -1,0 +1,110 @@
+[NbConvertApp] Converting notebook SMD.ipynb to notebook
+/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbformat/validator.py:434: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  _validate(nbdict, ref, version, version_minor, relax_add_props)
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+[NbConvertApp] Converting notebook SMD.ipynb to notebook
+/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbformat/validator.py:434: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  _validate(nbdict, ref, version, version_minor, relax_add_props)
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+Traceback (most recent call last):
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/bin/jupyter-nbconvert", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/traitlets/config/application.py", line 1080, in launch_instance
+    app.start()
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/.local/share/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# balanced sample for embedding plots
+rng = np.random.default_rng(42)
+pos = np.where(wl==1)[0]; neg = np.where(wl==0)[0]
+k = min(len(pos), 2000); kn = min(len(neg), 2000)
+sel = np.concatenate([rng.choice(pos, k, replace=False) if len(pos)>0 else pos,
+                      rng.choice(neg, kn, replace=False)])
+Xs, ys = X[sel], wl[sel]
+P.plot_pca(Xs, ys, os.path.join(FIGDIR, f'{NAME}_pca.pdf'))
+P.plot_tsne(Xs, ys, os.path.join(FIGDIR, f'{NAME}_tsne.pdf'))
+half = X.shape[1]//2
+P.plot_box_h0_h1(Xs, ys, half, os.path.join(FIGDIR, f'{NAME}_box_h0h1.pdf'))
+# 3D surface from a representative anomalous window's H0 image
+rep = pos[0] if len(pos)>0 else 0
+P.plot_surface(X[rep], half, os.path.join(FIGDIR, f'{NAME}_surface.pdf'))
+
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mTypeError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 11[39m
+[32m      7[39m Xs, ys = X[sel], wl[sel]
+[32m      8[39m P.plot_pca(Xs, ys, os.path.join(FIGDIR, [33mf'{NAME}_pca.pdf'[39m))
+[32m      9[39m P.plot_tsne(Xs, ys, os.path.join(FIGDIR, [33mf'{NAME}_tsne.pdf'[39m))
+[32m     10[39m half = X.shape[[32m1[39m]//[32m2[39m
+[32m---> [39m[32m11[39m P.plot_box_h0_h1(Xs, ys, half, os.path.join(FIGDIR, [33mf'{NAME}_box_h0h1.pdf'[39m))
+[32m     12[39m [38;5;66;03m# 3D surface from a representative anomalous window's H0 image[39;00m
+[32m     13[39m rep = pos[[32m0[39m] [38;5;28;01mif[39;00m len(pos)>[32m0[39m [38;5;28;01melse[39;00m [32m0[39m
+[32m     14[39m P.plot_surface(X[rep], half, os.path.join(FIGDIR, [33mf'{NAME}_surface.pdf'[39m))
+
+[36mFile [39m[32m~/Documents/Codes/Topological_fair_eval/external/TAME_e1/utils/plotting.py:68[39m, in [36mplot_box_h0_h1[39m[34m(X, y, channel_sz, path)[39m
+[32m     66[39m data = [h0[y==[32m0[39m], h0[y==[32m1[39m], h1[y==[32m0[39m], h1[y==[32m1[39m]]
+[32m     67[39m plt.figure()
+[32m---> [39m[32m68[39m [30;43mplt[39;49m[30;43m.[39;49m[30;43mboxplot[39;49m[30;43m([39;49m[30;43mdata[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mlabels[39;49m[30;43m=[39;49m[30;43m[[39;49m[30;43m"[39;49m[30;43mH0-N[39;49m[30;43m"[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43m"[39;49m[30;43mH0-A[39;49m[30;43m"[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43m"[39;49m[30;43mH1-N[39;49m[30;43m"[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43m"[39;49m[30;43mH1-A[39;49m[30;43m"[39;49m[30;43m][39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mshowfliers[39;49m[30;43m=[39;49m[30;43;01mTrue[39;49;00m[30;43m)[39;49m
+[32m     69[39m plt.xticks(fontsize=[32m20[39m)
+[32m     70[39m plt.ylabel([33m"[39m[33mSum of PI intensities[39m[33m"[39m)
+
+[36mFile [39m[32m~/Documents/Codes/Topological_fair_eval/.venv-tame/lib/python3.11/site-packages/matplotlib/_api/deprecation.py:477[39m, in [36mmake_keyword_only.<locals>.wrapper[39m[34m(*args, **kwargs)[39m
+[32m    471[39m [38;5;28;01mif[39;00m [38;5;28mlen[39m(args) > name_idx:
+[32m    472[39m     warn_deprecated(
+[32m    473[39m         since, message=[33m"[39m[33mPassing the [39m[38;5;132;01m%(name)s[39;00m[33m [39m[38;5;132;01m%(obj_type)s[39;00m[33m [39m[33m"[39m
+[32m    474[39m         [33m"[39m[33mpositionally is deprecated since Matplotlib [39m[38;5;132;01m%(since)s[39;00m[33m; the [39m[33m"[39m
+[32m    475[39m         [33m"[39m[33mparameter will become keyword-only in [39m[38;5;132;01m%(removal)s[39;00m[33m.[39m[33m"[39m,
+[32m    476[39m         name=name, obj_type=[33mf[39m[33m"[39m[33mparameter of [39m[38;5;132;01m{[39;00mfunc.[34m__name__[39m[38;5;132;01m}[39;00m[33m()[39m[33m"[39m)
+[32m--> [39m[32m477[39m [38;5;28;01mreturn[39;00m [30;43mfunc[39;49m[30;43m([39;49m[30;43m*[39;49m[30;43margs[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43m*[39;49m[30;43m*[39;49m[30;43mkwargs[39;49m[30;43m)[39;49m
+
+[31mTypeError[39m: boxplot() got an unexpected keyword argument 'labels'
+
+exit 1
