@@ -17,6 +17,8 @@ detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}
 comparisons:
   main_gain: {a: "F1+F2+F3", b: "F1+F2"}
   zigzag: {a: "Z", b: "Z-control"}
+behaviours_file: configs/e4_behaviours.yaml   # scenario -> Shape / Volume / Mixed / Unknown (note 61)
+feature_sets: ["F1+F2", "F1+F2+F3", "Z", "Z-control"]
 behaviour_types:                  # §3
   C&C: shape
   Port scan: shape
