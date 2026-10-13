@@ -3,6 +3,21 @@
 Updated at the end of every task. Latest entry first.
 
 
+
+## 2026-11-20 (night): E4, E4x, E3x run
+
+**Done** (commit `40641cd`, clean tree, `git_dirty` false in every sidecar)
+- **E4** (12 folds, 1,180 positive and 4,190 normal windows): F1+F2+F3 − F1+F2: Δ = +0.0086 [−0.0089, 0.0278], Inconclusive. Z − Z-control: Δ = −0.2827 [−0.4436, −0.1376]; §8 has no word for "worse", so the verdict is Inconclusive, but the CI is entirely below 0. Per-type cells (primary: flow-label typing; sensitivity: README/Table 2) in `results/E4/E4_by_wtype.csv` and `E4_by_type.csv`. No window is typed Identity-only; 335 positives are Unnamed.
+- **E4x (exploratory):** H0-only +0.0071 [−0.0092, 0.0298] Inconclusive; H1-only −0.0037 [−0.0138, 0.0081] No added value.
+- **E3x (exploratory):** H0-only +0.0553 [0.0358, 0.0779]; H1-only +0.0073 [−0.0007, 0.0162]; H1 − H0 −0.0480 [−0.0664, −0.0323]. **F1+F2 reproduces E3 bit for bit** (PR-AUC 0.4614546, all 140 machine-seed rows and thresholds identical; F1+F2+F3 too).
+- **Known measurement flaw (not fixed):** E4's `runtime_per_window_ms` charges the same feature time (which includes F3) to F1+F2 and F1+F2+F3, so those two runtimes are not separable (1.90 ms each). Same in E4x. Fix before quoting E4 runtimes.
+
+**Next**
+- Fix the E4 runtime accounting (re-time only, no rerun of results), then the dashboard and the report.
+
+**Open decisions (Anirudh)**
+- Still open: TBD dates in `docs/decision_log.md`; `prereg-v3` tag on the remote; Step 4 self re-check.
+
 ## 2026-11-20 (late): E4 typing by flow-label strings, E4x and E3x built (not run)
 
 **Done**

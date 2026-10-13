@@ -1,0 +1,29 @@
+E4: scenarios [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13], jobs=4
+stage 1: 12 of 12 scenarios to build
+  [1/12] scenario 4 done (6 s)
+  [2/12] scenario 5 done (7 s)
+  [3/12] scenario 2 done (8 s)
+  [4/12] scenario 7 done (8 s)
+  [5/12] scenario 6 done (10 s)
+  [6/12] scenario 1 done (13 s)
+  [7/12] scenario 11 done (14 s)
+  [8/12] scenario 12 done (16 s)
+  [9/12] scenario 9 done (26 s)
+  [10/12] scenario 13 done (27 s)
+  [11/12] scenario 8 done (30 s)
+  [12/12] scenario 3 done (36 s)
+stage 2: 12 of 12 folds to run
+  [1/12] fold 3 done (42 s)
+  [2/12] fold 1 done (42 s)
+  [3/12] fold 2 done (42 s)
+  [4/12] fold 4 done (42 s)
+  [5/12] fold 5 done (84 s)
+  [6/12] fold 6 done (84 s)
+  [7/12] fold 7 done (84 s)
+  [8/12] fold 8 done (86 s)
+  [9/12] fold 11 done (126 s)
+  [10/12] fold 12 done (126 s)
+  [11/12] fold 9 done (128 s)
+  [12/12] fold 13 done (129 s)
+wrote results/E4/E4_results.csv
+e4 exit 0
