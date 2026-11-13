@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 
 from src.detector import IFDetector
+from src.knn_detector import KNNDetector
 from src.feature_sets import GROUPS
 from src.metadata import run_metadata, save_result
 from src.metrics import evaluate
@@ -52,10 +53,22 @@ def group_features(mw, groups):
     return out
 
 
-def run_machine(cfg, machine):
-    """All result rows (every seed, every feature set) for one machine."""
+def make_detector(det_cfg, seed):
+    """Isolation Forest (E2, E3, ...) or, for the exploratory L3, a kNN distance detector."""
+    if det_cfg["name"] == "isolation_forest":
+        return IFDetector(seed, det_cfg["n_estimators"], det_cfg.get("max_samples", "auto"))
+    if det_cfg["name"] == "knn":
+        return KNNDetector(det_cfg.get("k", 5))
+    raise ValueError(det_cfg)
+
+
+def run_machine(cfg, machine, on_scores=None):
+    """All result rows (every seed, every feature set) for one machine.
+
+    on_scores(name, seed, scores, labels, threshold, val_scores) is an optional hook (used by L1 to add metrics
+    without retraining); it changes nothing in the rows.
+    """
     det_cfg, feature_sets = pipeline_spec(cfg)
-    assert det_cfg["name"] == "isolation_forest", det_cfg
     w, minutes = cfg["windows"], cfg.get("minutes_per_point", 1.0)
     mw = prepare_machine(machine, root=cfg["data_root"], size=w["size"], step=w["step"],
                          tail=w["label_tail"], val_frac=cfg["split"]["val_frac"])
@@ -68,7 +81,7 @@ def run_machine(cfg, machine):
         X = {k: np.hstack([feats[p][k] for p in parts]) for k in ("train", "val", "test")}
         feature_seconds = sum(feats[p]["seconds_per_window"] for p in parts)
         for seed in cfg["seeds"]:
-            det = IFDetector(seed, det_cfg["n_estimators"], det_cfg.get("max_samples", "auto"))
+            det = make_detector(det_cfg, seed)
             det.fit(X["train"])
             val_scores = det.score(X["val"])
             thr = threshold_at_fpr(val_scores, fpr)                      # validation only
@@ -76,6 +89,8 @@ def run_machine(cfg, machine):
             scores = det.score(X["test"])
             score_seconds = (time.perf_counter() - t0) / len(scores)
             row = evaluate(scores, mw.test_labels, thr, mw.n_test_points, minutes)
+            if on_scores is not None:
+                on_scores(name, seed, scores, mw.test_labels, thr, val_scores)
             rows.append({"experiment": cfg["experiment"], "machine": machine, "seed": seed,
                          "feature_set": name, "n_features": X["train"].shape[1], "threshold": thr,
                          "n_train_windows": len(mw.train), "n_val_windows": len(mw.val),

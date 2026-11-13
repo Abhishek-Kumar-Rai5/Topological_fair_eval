@@ -1,0 +1,17 @@
+# L1 (EXPLORATORY, docs/plan_A_lite.md): paper-style metrics for E3 and E2 detectors, re-scored with the committed code.
+experiment: L1
+dataset: SMD
+data_root: data/SMD
+seeds: [0, 1, 2, 3, 4]
+n_thresholds: 400            # best-F1 thresholds: 400 evenly spaced values between the lowest and highest test score
+random_seed: 0               # RANDOM row: uniform scores, same 1%-validation threshold rule
+sources:                     # the committed configs that define each group
+  ours: configs/e3_swap.yaml
+  methods: configs/e2_tada_phantom.yaml
+  tame: configs/e2_tame.yaml
+reference_results:           # pr_auc of every re-scored row must equal these files
+  ours: results/E3/E3_results.csv
+  methods: results/E2m/E2m_results.csv
+  tame: results/E2m_tame/E2m_results.csv
+point_adjustment: "window level, best-F1 only; main metrics stay without point adjustment"
+bootstrap: {cluster: machine, n_resamples: 2000, ci: 0.95}

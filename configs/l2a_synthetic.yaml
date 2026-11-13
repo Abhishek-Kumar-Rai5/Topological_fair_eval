@@ -1,0 +1,15 @@
+# L2a (EXPLORATORY): synthetic sanity check for H1 and the delay tau.
+experiment: L2a
+channels: 10
+periods: [24, 37]            # even channels 24, odd channels 37
+noise: 0.1
+n_train: 2400                # 80% fit, 20% validation (same split rule), test 2400
+n_test: 2400
+anomaly: {channel: 0, start: 1200, length: 60, period_factor: 2}
+windows: {size: 60, step: 10, label_tail: 10}
+taus: [1, 6]
+embed_dim: 3
+data_seeds: [0, 1, 2, 3, 4]  # one synthetic dataset per seed; the same seed is used for the Isolation Forest
+detector: {n_estimators: 300}
+features: "H1-only: the 16 H1 summaries of F3 with the chosen tau, whole z-scored window as one cloud"
+threshold: {false_alarm_rate: 0.01, on: validation}

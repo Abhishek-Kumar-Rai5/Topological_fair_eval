@@ -238,8 +238,11 @@ def build_adapters(cfg, seed, cache=None, feature_fn=None):
     return out
 
 
-def run_machine(cfg, machine, feature_fn=None):
-    """(results, failures) for one machine. A method that raises is recorded, not hidden, and the others still run."""
+def run_machine(cfg, machine, feature_fn=None, on_scores=None):
+    """(results, failures) for one machine. A method that raises is recorded, not hidden, and the others still run.
+
+    on_scores(name, seed, scores, labels, threshold, val_scores): optional hook (L1); changes nothing in the rows.
+    """
     w, fpr = cfg["windows"], cfg["threshold"]["false_alarm_rate"]
     size, step, tail = w["size"], w["step"], w["label_tail"]
     train, test, point_labels = load_machine(machine, cfg["data_root"])
@@ -249,11 +252,13 @@ def run_machine(cfg, machine, feature_fn=None):
     cache = None
     if "TAME" in cfg["retested_methods"]:
         cache = TameFeatureCache(feature_fn or tame_feature_fn())
-    rows, failures, done = [], [], {}
+    rows, failures, done, done_args = [], [], {}, {}
     for seed in cfg["seeds"]:
         for ad in build_adapters(cfg, seed, cache):
             if ad.name in done and ad.deterministic:                # same numbers for every seed: copy
                 rows.append({**done[ad.name], "seed": seed})
+                if on_scores is not None:
+                    on_scores(ad.name, seed, *done_args[ad.name])
                 continue
             if ad.name in {f["method"] for f in failures}:
                 continue
@@ -274,8 +279,11 @@ def run_machine(cfg, machine, feature_fn=None):
                        "fit_seconds": fit_s, "runtime_per_window_ms": 1000 * per_window,
                        **evaluate(scores, labels, thr, len(test), cfg.get("minutes_per_point", 1.0))}
                 rows.append(row)
+                if on_scores is not None:
+                    on_scores(ad.name, seed, scores, labels, thr, val_scores)
                 if ad.deterministic:
                     done[ad.name] = row
+                    done_args[ad.name] = (scores, labels, thr, val_scores)
             except Exception as e:                                           # report the failure, keep going
                 failures.append({"machine": machine, "method": ad.name, "seed": seed,
                                  "error": f"{type(e).__name__}: {e}"[:500]})

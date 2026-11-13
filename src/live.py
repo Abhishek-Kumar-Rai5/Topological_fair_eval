@@ -5,6 +5,7 @@ function in this file; the app shows a window's label after scoring, for display
 """
 import numpy as np
 from ripser import ripser
+from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 from sklearn.decomposition import PCA
 
@@ -35,7 +36,7 @@ def window_view(f3, window):
     np.fill_diagonal(d, 0.0)
     off = ~np.eye(len(d), dtype=bool)
     d[off & (d == 0)] = ZERO / 10                      # scipy treats a 0 as "no edge"; keep duplicate points connected
-    mst = np.sort(minimum_spanning_tree(d).data)
+    mst = np.sort(minimum_spanning_tree(csr_matrix(d)).data)   # sparse input: a dense one drops values below ~1e-8
     mst = mst[mst > ZERO]
     deaths = np.sort(dgm0[np.isfinite(dgm0[:, 1]), 1])
     deaths = deaths[deaths > ZERO]

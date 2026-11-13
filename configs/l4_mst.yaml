@@ -1,0 +1,8 @@
+# L4 (EXPLORATORY): MST edge lengths against ripser H0 deaths on the F3 clouds of one machine; timing of the two.
+experiment: L4
+machine: machine-1-1
+data_root: data/SMD
+windows: {size: 60, step: 10, label_tail: 10}
+split: {val_frac: 0.2}
+which_windows: test           # every test window of the machine
+repeats: 3                    # each timing is the best of 3 passes over all windows, single thread

@@ -1,0 +1,19 @@
+# L2b (EXPLORATORY, docs/plan_A_lite.md): "H1-friendly" per-channel clouds with tau from autocorrelation, same windows/labels as E3.
+experiment: L2b
+dataset: SMD
+data_root: data/SMD
+windows: {size: 60, step: 10, label_tail: 10}
+split: {val_frac: 0.2}
+threshold: {false_alarm_rate: 0.01, on: validation}
+seeds: [0, 1, 2, 3, 4]
+minutes_per_point: 1.0
+detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}
+feature_sets: ["F1+F2", "F1+F2+PC-H0", "F1+F2+PC-H1"]    # PC = per-channel clouds, m=3, tau=tau_ac, averaged over channels
+comparisons:
+  h1: {a: "F1+F2+PC-H1", b: "F1+F2"}
+  h0: {a: "F1+F2+PC-H0", b: "F1+F2"}
+  h1_vs_h0: {a: "F1+F2+PC-H1", b: "F1+F2+PC-H0"}
+rule_fixed_in_advance: "H1 Helps (F1+F2+PC-H1 vs F1+F2) -> 'loops help with a proper embedding'; otherwise 'H1 adds nothing even with an H1-friendly embedding'"
+point_adjustment: false
+bootstrap: {cluster: machine, n_resamples: 2000, ci: 0.95}
+verdict: {equivalence_margin: 0.02, min_positive_windows: 20, min_normal_windows: 20}

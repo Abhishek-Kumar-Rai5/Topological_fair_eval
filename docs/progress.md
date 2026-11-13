@@ -5,6 +5,22 @@ Updated at the end of every task. Latest entry first.
 
 
 
+## 2026-11-21: Plan A-lite, step 1 (code and design only, nothing run)
+
+**Done**
+- `docs/plan_A_lite.md` fixes L1–L5; one dated entry in `deviations_log.md`.
+- Code and tests (`tests/test_alite.py`, 169 passed, 1 skipped in the full suite): `src/alite.py` (extra metrics, point adjustment, RANDOM scores, synthetic data, τ_ac, per-channel PH features, MST helpers), `src/alite_l1.py`, `src/knn_detector.py`, groups `PC-H0` / `PC-H1` in `src/feature_sets.py`, `make_detector` and no-op `on_scores` hooks in `src/runner.py` and `src/e2_methods.py`. Scripts: `run_l1.py`, `summarize_l1.py`, `run_l2a.py`, `summarize_l2b.py`, `summarize_l3.py`, `l4_mst.py`, `make_blank_sheet.py`, `agreement.py`. Configs: `l1_metrics`, `l2a_synthetic`, `l2b_h1_friendly`, `l3_knn`, `l4_mst`.
+- L5: `literature/recheck/blank_sheet.csv` (7 papers, no scores) and `definitions.md`.
+- Bug found and fixed in `src/live.py` (app only): scipy's MST on a dense matrix drops values below ~1e-8, so identical points could give a wrong tree. No result file used it.
+
+**Next**
+1. Anirudh commits. Then step 2: run L1–L4 (commands in `docs/plan_A_lite.md`) and report.
+2. Anirudh fills the blank sheet, then `python scripts/agreement.py`.
+
+**Open decisions (Anirudh)**
+- (Resolved: rubric wording pasted into `literature/recheck/definitions.md`.)
+- L1 "ours" and L3 both recompute F3 (about as long as E3 each); L2b adds per-channel ripser (an estimated few minutes per machine). Say if you want any of them cut.
+
 ## 2026-11-20 (late night): Streamlit demo `app.py`
 
 **Done**
