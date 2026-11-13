@@ -1,0 +1,78 @@
+{
+  "git_commit": "ffb1efdd4bfb0bf7bc16639d3e77b6a77b819118",
+  "git_dirty": false,
+  "seed": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "config": {
+    "experiment": "L2a",
+    "channels": 10,
+    "periods": [
+      24,
+      37
+    ],
+    "noise": 0.1,
+    "n_train": 2400,
+    "n_test": 2400,
+    "anomaly": {
+      "channel": 0,
+      "start": 1200,
+      "length": 60,
+      "period_factor": 2
+    },
+    "windows": {
+      "size": 60,
+      "step": 10,
+      "label_tail": 10
+    },
+    "taus": [
+      1,
+      6
+    ],
+    "embed_dim": 3,
+    "data_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "detector": {
+      "n_estimators": 300
+    },
+    "features": "H1-only: the 16 H1 summaries of F3 with the chosen tau, whole z-scored window as one cloud",
+    "threshold": {
+      "false_alarm_rate": 0.01,
+      "true": "validation"
+    },
+    "_path": "configs/l2a_synthetic.yaml"
+  },
+  "python": "3.11.18",
+  "libraries": {
+    "numpy": "2.4.6",
+    "pandas": "3.1.1",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.1",
+    "ripser": "0.6.15",
+    "persim": "0.4.1",
+    "gudhi": "3.13.0",
+    "dionysus": "2.2.3",
+    "tdaad": "1.6.0",
+    "pyarrow": "26.0.1",
+    "PyYAML": "6.0.3"
+  },
+  "hardware": {
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "machine": "x86_64",
+    "processor": "",
+    "cpu_count": 16
+  },
+  "created_utc": "2026-11-21T09:21:55+00:00",
+  "exploratory": true,
+  "seconds": 12.78981328010559,
+  "n_rows": 10
+}

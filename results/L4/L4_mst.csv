@@ -1,0 +1,2 @@
+machine,n_windows,points_per_window,max_abs_diff,median_abs_diff,windows_count_mismatch,ms_per_window_distances_only,ms_per_window_mst_path,ms_per_window_ripser_h0_path,ripser_over_mst
+machine-1-1,2842,58,7.078418434502964e-06,2.229132238795728e-07,0,0.06636840745676925,0.40906816432279564,0.35051503448509846,0.8568621688401719

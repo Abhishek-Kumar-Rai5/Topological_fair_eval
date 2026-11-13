@@ -1,0 +1,4 @@
+group,reference,rows_compared,rows_in_L1,max_abs_diff_pr_auc,rows_differing_gt_1e-9
+ours,results/E3/E3_results.csv,700,700,0.0,0
+methods,results/E2m/E2m_results.csv,280,280,0.0,0
+tame,results/E2m_tame/E2m_results.csv,140,140,0.0,0

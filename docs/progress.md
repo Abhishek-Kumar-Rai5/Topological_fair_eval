@@ -5,6 +5,22 @@ Updated at the end of every task. Latest entry first.
 
 
 
+## 2026-11-21 (later): Plan A-lite, step 2 (L1-L4 run)
+
+**Done** (exploratory, nothing decides a prediction; results in `results/L1`..`L4`, log `results/run_L_chain.log`)
+- L1: every re-scored PR-AUC equals E3/E2m/E2m_tame exactly (1,120 rows). Table in `results/L1/L1_table.csv`. About 44 min (ours 1,821 s, methods 220 s, TAME 632 s).
+- L2a: tau=6 ROC-AUC 0.895 vs tau=1 0.805; max H1 persistence rises only at tau=6.
+- L2b: H1 vs F1+F2 = +0.004 [-0.004, +0.013], "No added value" -> rule: "H1 adds nothing even with an H1-friendly embedding". H0 vs F1+F2 = +0.034 [+0.023, +0.047], "Helps". F1+F2 reproduces E3 exactly. About 25 min.
+- L3: kNN removes the Isolation Forest gain (Delta main -0.022 [-0.056, +0.002]). About 10 min.
+- L4: max |MST - H0| = 7e-6 over 2,842 windows; MST path 0.409 ms vs ripser H0 0.351 ms per window.
+- L3 did not reuse L1's F3 features: the runner has no feature cache, so F3 was computed twice.
+
+**Next**
+1. Anirudh commits the results. 2. Fill `literature/recheck/blank_sheet.csv`, save as `filled_sheet.csv`, run `scripts/agreement.py`.
+
+**Open decisions**
+- None new.
+
 ## 2026-11-21: Plan A-lite, step 1 (code and design only, nothing run)
 
 **Done**
