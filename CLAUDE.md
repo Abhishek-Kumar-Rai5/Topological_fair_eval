@@ -37,6 +37,7 @@
    - Any repository that won't run: 2 days, then report the failure with logs.
 5. **Every result file records** the git commit, the seed and the library versions.
 6. **Never invent numbers.** If something fails, report that it failed.
+7. **Claude never runs `git add`, `git commit`, `git tag` or `git push`.** At the end of each task, Claude gives Anirudh the exact commands to run: which files to `git add` and a short commit message. Never stage `data/`, `external/` or `.venv/`.
 
 ## 3. Plan and status
 
