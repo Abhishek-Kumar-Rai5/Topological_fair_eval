@@ -1,0 +1,23 @@
+# Top-level dependencies (Python 3.11). Compile the pinned lock with:
+#   uv pip compile requirements.in --python-version 3.11 -o requirements.txt
+# tdaad is installed separately; see requirements-nodeps.txt and setup_env.sh.
+
+# core
+numpy
+pandas
+scipy
+scikit-learn
+pyarrow          # Parquet results
+pyyaml           # experiment configs
+
+# topology
+ripser
+persim
+gudhi            # also needed by tdaad
+dionysus         # zigzag persistence (E4); fallback in prereg §7 if it fails
+
+# plots, demo, tests
+matplotlib
+streamlit
+tqdm             # tdaad dependency
+pytest

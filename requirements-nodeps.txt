@@ -1,0 +1,4 @@
+# Installed with: pip install --no-deps --ignore-requires-python -r requirements-nodeps.txt
+# tdaad declares requires-python>=3.12 but its code parses and runs on 3.11 (checked 2026-11-19);
+# its dependencies (gudhi, numpy, pandas, scikit-learn, scipy, tqdm) are pinned in requirements.txt.
+tdaad @ git+https://github.com/IRT-SystemX/tdaad@d103a2cb5b48ec435afff9b7f75185ff2da6ca3f
