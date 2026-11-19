@@ -2,6 +2,26 @@
 
 Updated at the end of every task. Latest entry first.
 
+## 2026-11-19 (night): E5 injections, atomic writes, E2 adapters (worktree `dev`; nothing run on real data)
+
+**Done**
+- **Atomic writes + validated `--resume`** (`src/metadata.py`, `scripts/run_experiment.py`, `tests/test_atomic.py`). Done before any real run, so E5 and the E2 adapters build on it.
+- **E5 injection module** (`src/injections.py`) and **runner** (`src/e5.py`, `scripts/run_experiment.py configs/e5_injections.yaml`), **summary** (`scripts/summarize_e5.py`, reuses `summarize_smd.py` from master). Choices 22–38 in `docs/implementation_notes.md`.
+- Removed the older, duplicate `src/inject.py` / `tests/test_inject.py`; its only extra rule (training std ≥ 0.01 for V1–V3) was ported.
+- **E2 adapters** (`src/e2_methods.py`; `run_experiment.py --methods`): TADA, PHANTOM, TAME (IF fixed; GMM and OCSVM reported separately). Choices 39–48 in `docs/implementation_notes.md`. 108 tests pass (1 skipped: needs giotto-tda).
+- Toy-data tests only.
+
+**Next**
+1. Merge `master` into `dev` (`summarize_smd.py` is needed by `summarize_e5.py` and its test).
+2. Commit (3 batches, commands in chat), then run E5 and E2 methods in the main folder.
+3. TAME: giotto-tda is not installed; installing it in the main venv would downgrade numpy and scikit-learn. Use a separate venv (note 48).
+
+**Open decisions (Anirudh)**
+- E5: nothing new. Choices 22–25 confirmed in chat today.
+- **E2 choices 39–48 need your OK**, mainly: 39 (TAME on our windows, a third change), 40 (TADA window mapping), 43 (PHANTOM vector), 48 (TAME venv).
+- **CLAUDE.md §4 says PHANTOM uses the bottleneck distance; `main.py` uses Wasserstein** (note 42). Please correct the line.
+- Still open: TBD dates in `docs/decision_log.md`; check `prereg-v3` is on the remote; Step 4 self re-check.
+
 
 
 
