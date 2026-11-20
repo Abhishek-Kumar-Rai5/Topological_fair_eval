@@ -1,0 +1,7 @@
+machine,type,kind,n_requested,n_placed,reason,n_periodic,n_pairs,n_volume_channels
+machine-3-11,S1,shape,10,10,,9,86,18
+machine-3-11,S2,shape,10,10,,9,86,18
+machine-3-11,S3,shape,10,10,,9,86,18
+machine-3-11,V1,volume,10,10,,9,86,18
+machine-3-11,V2,volume,10,10,,9,86,18
+machine-3-11,V3,volume,10,10,,9,86,18

@@ -1,0 +1,3 @@
+prediction,outcome,detail
+P1,Refuted,"shape types: S1=No added value, S2=No added value, S3=No added value"
+P2,Inconclusive,"volume types: V1=No added value, V2=Helps (CI also inside ±0.02), V3=No added value"

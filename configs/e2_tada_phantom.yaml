@@ -1,0 +1,21 @@
+# E2 (TADA and PHANTOM only; TAME runs in .venv-tame): fair re-test on SMD of TADA, PHANTOM and TAME (fixed), next to our pipelines (prereg §5, §7).
+experiment: E2
+dataset: SMD
+data_root: data/SMD
+windows: {size: 60, step: 10, label_tail: 10}     # §2
+split: {val_frac: 0.2}                            # §2: last 20% of training = validation
+threshold: {false_alarm_rate: 0.01, on: validation}  # §5
+seeds: [0, 1, 2, 3, 4]                            # §5: 5 seeds
+minutes_per_point: 1.0                            # SMD sampling interval, see data/README.md
+our_pipelines:
+  detector: {name: isolation_forest, n_estimators: 300, max_samples: auto}  # §5 fixed defaults
+  feature_sets: ["F1+F2", "F1+F2+F3"]
+retested_methods:
+  TADA:    {package: tdaad, commit: d103a2cb5b48ec435afff9b7f75185ff2da6ca3f, params: default}
+  PHANTOM: {repo: external/PHANTOM, commit: 8caa25a8a5e305d2b2ec91bfdd9a743f52034b70, params: default, same_windows: true}
+metrics: [pr_auc, recall_at_thr, false_alarms_per_day, roc_auc, runtime_per_window]  # §6
+point_adjustment: false
+reporting: overall_only           # §1: real SMD anomalies are untyped, so E2 does not enter P1/P2
+used_for: P3                      # TAME E2 vs E1; TADA and PHANTOM descriptive only (§8)
+bootstrap: {cluster: machine, n_resamples: 2000, ci: 0.95}  # §8
+timebox_days_per_failing_repo: 2

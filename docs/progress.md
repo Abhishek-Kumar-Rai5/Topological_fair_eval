@@ -2,6 +2,24 @@
 
 Updated at the end of every task. Latest entry first.
 
+
+## 2026-11-20: E5, E2 methods, TAME (own windows), E1
+
+**Done** (all runs from commit `ac1524e`, tracked files clean, so `git_dirty` is false in every result sidecar; four laptop shutdowns were handled with `--resume` / cached chunks)
+- **E5** (28 machines × 6 types × 3 magnitudes × 5 seeds): `results/E5/` with `E5_summary/verdicts/predictions.csv`. **The F1+F2 baseline is near chance in every cell (ROC-AUC 0.50–0.60, PR-AUC 0.03–0.05, base rate 0.03), so the preregistered E5 failed to detect the injections and its P1/P2 verdicts are uninformative.** No bug found: the injections change the windows and detection rises with magnitude.
+- **E2:** TADA, PHANTOM (`results/E2m/`), TAME on our windows (`results/E2m_tame/`, `.venv-tame`), fixed TAME on its own windows (`results/E2_tame_own/`). Table: `results/E2m/E2_table.csv` (`scripts/summarize_e2.py`). SHA-256 of `run_tame_own_windows.py` and `summarize_e2.py` are in their `.meta.json` files.
+- **E1:** TAME's released SMD notebook, unchanged, in `external/TAME_e1`: best detector GMM, ROC-AUC 0.808 (reported 0.808). Isolation Forest 0.801. `results/E1/`. The notebook's plotting cell failed on a newer matplotlib after the results were written (details in implementation notes).
+- `CLAUDE.md` §4: PHANTOM now says Wasserstein. `.gitignore`: `.venv-tame/`. Choices 39, 40, 43 approved and logged (39 in `deviations_log.md`).
+
+**Next**
+1. E5b (exploratory) only after your OK; proposal is in `deviations_log.md`.
+2. E4 CTU-13 + zigzag; dashboard; report.
+
+**Open decisions (Anirudh)**
+- E5b: run or not.
+- P3: the E1 vs E2 ROC-AUC difference is −0.008 (E1 best-of-detectors 0.808, fixed TAME-IF on its own windows 0.800), inside ±0.02. A formal CI of that difference was not computed.
+- Still open: TBD dates in `docs/decision_log.md`; `prereg-v3` tag on the remote; Step 4 self re-check.
+
 ## 2026-11-19 (night): E5 injections, atomic writes, E2 adapters (worktree `dev`; nothing run on real data)
 
 **Done**

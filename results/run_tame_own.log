@@ -1,0 +1,83 @@
+TDA: processed 0/250 windows
+  features: chunk 1/29 (9 s)
+TDA: processed 0/250 windows
+  features: chunk 2/29 (8 s)
+TDA: processed 0/250 windows
+  features: chunk 3/29 (6 s)
+TDA: processed 0/250 windows
+  features: chunk 4/29 (7 s)
+TDA: processed 0/250 windows
+  features: chunk 5/29 (6 s)
+TDA: processed 0/250 windows
+  features: chunk 6/29 (8 s)
+TDA: processed 0/250 windows
+  features: chunk 7/29 (7 s)
+TDA: processed 0/250 windows
+  features: chunk 8/29 (9 s)
+TDA: processed 0/250 windows
+  features: chunk 9/29 (7 s)
+TDA: processed 0/250 windows
+  features: chunk 10/29 (7 s)
+TDA: processed 0/250 windows
+  features: chunk 11/29 (6 s)
+TDA: processed 0/250 windows
+  features: chunk 12/29 (6 s)
+TDA: processed 0/250 windows
+  features: chunk 13/29 (8 s)
+TDA: processed 0/250 windows
+  features: chunk 14/29 (6 s)
+Traceback (most recent call last):
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/scripts/run_tame_own_windows.py", line 153, in <module>
+    main()
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/scripts/run_tame_own_windows.py", line 98, in main
+    X, feat_s = extract_features(windows, feature_cols, Path(args.cache_dir), args.jobs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/Documents/Codes/Topological_fair_eval/scripts/run_tame_own_windows.py", line 62, in extract_features
+    if f.exists() and meta.exists() and json.loads(meta.read_text()).get("n") == len(chunk):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/.local/share/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/.local/share/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/abhishek/.local/share/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+TDA: processed 0/250 windows
+  features: chunk 15/29 (14 s)
+TDA: processed 0/250 windows
+  features: chunk 16/29 (13 s)
+TDA: processed 0/250 windows
+  features: chunk 17/29 (11 s)
+TDA: processed 0/250 windows
+  features: chunk 18/29 (12 s)
+TDA: processed 0/250 windows
+  features: chunk 19/29 (9 s)
+TDA: processed 0/250 windows
+  features: chunk 20/29 (12 s)
+TDA: processed 0/250 windows
+  features: chunk 21/29 (12 s)
+TDA: processed 0/250 windows
+  features: chunk 22/29 (18 s)
+TDA: processed 0/250 windows
+  features: chunk 23/29 (12 s)
+TDA: processed 0/250 windows
+  features: chunk 24/29 (8 s)
+TDA: processed 0/250 windows
+  features: chunk 25/29 (6 s)
+TDA: processed 0/250 windows
+  features: chunk 26/29 (6 s)
+TDA: processed 0/250 windows
+  features: chunk 27/29 (8 s)
+TDA: processed 0/250 windows
+  features: chunk 28/29 (7 s)
+TDA: processed 0/84 windows
+  features: chunk 29/29 (2 s)
+ seed  pr_auc  roc_auc  recall_at_thr  false_alarms_per_day  val_alarm_rate
+   42   0.459    0.801          0.230                 0.096           0.009
+    0   0.465    0.801          0.224                 0.077           0.009
+    1   0.463    0.799          0.241                 0.089           0.009
+    2   0.460    0.801          0.230                 0.083           0.009
+    3   0.462    0.797          0.241                 0.091           0.009
+test windows 3542 (465 positive), per-machine rows 140, feature s/window 0.035
