@@ -3,11 +3,28 @@
 Updated at the end of every task. Latest entry first.
 
 
+
+## 2026-11-20 (later): P3 CI, V2 gap, E5b built (not run)
+
+**Done**
+- P3 with CIs over 28 machines (`scripts/p3_e1_vs_e2.py`, `results/P3/`): all four comparisons Refuted under §8 (see below in the E1 entry).
+- V2 precedence gap logged in `deviations_log.md`; E5 P1/P2 reported as uninformative (baseline at chance); mechanical verdicts only as a footnote.
+- **E5b (exploratory, k = 5, approved)**: `src/injections_k.py`, `src/e5b.py`, `scripts/summarize_e5b.py`, `configs/e5b_injections.yaml`, dispatch in `scripts/run_experiment.py`, `tests/test_e5b.py` (7 tests). **Not run yet**: the code is to be committed first so the run is on a frozen, clean tree. Rule: a cell counts only if the F1+F2 ROC-AUC is at least 0.7; P1/P2 are not decided from it; if the baseline still fails, report and stop.
+
+**Next**
+1. After your commit: `python scripts/run_experiment.py configs/e5b_injections.yaml --jobs 4 --resume`, then `python scripts/summarize_e5b.py results/E5b`.
+2. E4 CTU-13 + zigzag; dashboard; report.
+
+**Open decisions (Anirudh)**
+- Still open: TBD dates in `docs/decision_log.md`; `prereg-v3` tag on the remote; Step 4 self re-check.
+
 ## 2026-11-20: E5, E2 methods, TAME (own windows), E1
 
 **Done** (all runs from commit `ac1524e`, tracked files clean, so `git_dirty` is false in every result sidecar; four laptop shutdowns were handled with `--resume` / cached chunks)
 - **E5** (28 machines × 6 types × 3 magnitudes × 5 seeds): `results/E5/` with `E5_summary/verdicts/predictions.csv`. **The F1+F2 baseline is near chance in every cell (ROC-AUC 0.50–0.60, PR-AUC 0.03–0.05, base rate 0.03), so the preregistered E5 failed to detect the injections and its P1/P2 verdicts are uninformative.** No bug found: the injections change the windows and detection rises with magnitude.
 - **E2:** TADA, PHANTOM (`results/E2m/`), TAME on our windows (`results/E2m_tame/`, `.venv-tame`), fixed TAME on its own windows (`results/E2_tame_own/`). Table: `results/E2m/E2_table.csv` (`scripts/summarize_e2.py`). SHA-256 of `run_tame_own_windows.py` and `summarize_e2.py` are in their `.meta.json` files.
+- **P3 (2026-11-20):** `scripts/p3_e1_vs_e2.py`, `results/P3/`. Fixed TAME-IF on its own windows minus E1, bootstrap over 28 machines: vs E1 best (GMM) ROC-AUC −0.0068 [−0.0180, 0.0033], PR-AUC −0.0029 [−0.0199, 0.0152]; vs E1 Isolation Forest ROC-AUC −0.0011 [−0.0029, 0.0007], PR-AUC −0.0016 [−0.0058, 0.0029]. All four inside ±0.02, so §8 gives **Refuted** for each. BLAS thread count changes TAME's IF AUROC by about 0.001 (1 vs 4 threads).
+- **E5:** P1 and P2 are reported as **uninformative** because the baseline is at chance. Mechanical verdicts (footnote only): P1 Refuted, P2 Inconclusive. V2 gap in §8 logged in `deviations_log.md`.
 - **E1:** TAME's released SMD notebook, unchanged, in `external/TAME_e1`: best detector GMM, ROC-AUC 0.808 (reported 0.808). Isolation Forest 0.801. `results/E1/`. The notebook's plotting cell failed on a newer matplotlib after the results were written (details in implementation notes).
 - `CLAUDE.md` §4: PHANTOM now says Wasserstein. `.gitignore`: `.venv-tame/`. Choices 39, 40, 43 approved and logged (39 in `deviations_log.md`).
 
