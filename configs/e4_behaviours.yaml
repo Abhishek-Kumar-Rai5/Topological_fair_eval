@@ -1,0 +1,18 @@
+# E4 scenario behaviour types (prereg §2 README fallback; implementation note 61). NEEDS ANIRUDH'S CONFIRMATION.
+# Type of each scenario = the type of the behaviours its README names (prereg §3 table:
+# C&C, port scan, P2P = Shape; spam = Identity; click fraud, DDoS = Volume); Mixed if they disagree;
+# Unknown if the README names no behaviour (those scenarios count in the overall result only).
+# Scenario 10 has no .binetflow and is not used.
+scenarios:
+  1:  {type: Mixed,   evidence: "README-42: spam (identity) + HTTP C&C (shape) + click fraud (volume)"}
+  2:  {type: Unknown, evidence: "README-43 names no behaviour"}
+  3:  {type: Unknown, evidence: "README-44 names no behaviour"}
+  4:  {type: Volume,  evidence: "README-45: UDP DoS and SYN flood commands"}
+  5:  {type: Unknown, evidence: "README-46 names no behaviour (fast-flux)"}
+  6:  {type: Unknown, evidence: "README-47 names no behaviour"}
+  7:  {type: Mixed,   evidence: "README-48: spam (identity) + IRC + click fraud (volume)"}
+  8:  {type: Shape,   evidence: "README-49: C&C to china hosts"}
+  9:  {type: Unknown, evidence: "README-50 names no behaviour"}
+  11: {type: Volume,  evidence: "README-52: ICMP DoS by an IRC botnet"}
+  12: {type: Shape,   evidence: "README-53: P2P protocol"}
+  13: {type: Unknown, evidence: "README-54 names no behaviour (fast-flux)"}

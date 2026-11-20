@@ -1,0 +1,67 @@
+\section{Background: what TDA can and cannot capture}
+\label{sec:background}
+
+This section gives just enough TDA to follow the rest of the report. It ends with the argument behind P1 and P2: which kinds of change a topological summary can see at all, and which of them cheap statistics already see.
+
+\subsection{Persistent homology}
+Start with a finite set of points $X$, for example the samples in one telemetry window. For a scale $\varepsilon \ge 0$, the \emph{Vietoris--Rips complex} $\mathrm{VR}_\varepsilon(X)$ contains a simplex (edge, triangle and so on) for every group of points that are pairwise within distance $\varepsilon$. As $\varepsilon$ grows, the complexes only gain simplices, so they form a nested sequence called a \emph{filtration}.
+
+Along the filtration, topological features appear and disappear:
+\begin{itemize}
+  \item an \textbf{$H_0$ class} is a connected component. Every point starts as its own component, and components merge as $\varepsilon$ grows;
+  \item an \textbf{$H_1$ class} is a loop: a cycle of edges that is not yet filled in by triangles.
+\end{itemize}
+Each class has a birth scale $b$ and a death scale $d$. The multiset of pairs $(b,d)$ is the \emph{persistence diagram}; drawn as intervals, it is the \emph{barcode}~\cite{edelsbrunner2002persistence,A01}. Long bars are read as real structure and short bars as noise.
+
+Two properties matter for detection:
+\begin{itemize}
+  \item \textbf{Stability.} Small changes to the input move the diagram only a little, as measured by the bottleneck distance~\cite{A02}. This makes diagrams robust to noise. It also means that a small anomaly produces only a small change in the diagram.
+  \item \textbf{Invariance.} Rips persistence depends only on the pairwise distances between points. Translating the whole cloud, or relabelling its points, leaves the diagram unchanged. Scaling every distance by a factor $c$ scales every birth and death by $c$.
+\end{itemize}
+
+Detectors need fixed-length vectors, so diagrams are summarised: bar counts and lifetime statistics, persistent entropy, Betti curves (the number of alive classes at each scale), persistence landscapes~\cite{A03} or persistence images~\cite{A04}. We compute Rips persistence with Ripser~\cite{A06}.
+
+\subsection{From time series to point clouds}
+A telemetry window is a sequence, not a point cloud. The standard bridge is \emph{delay embedding}. A window $x_1,\dots,x_w$ becomes the points
+\[
+  v_i = \bigl(x_i,\; x_{i+\tau},\; \dots,\; x_{i+(m-1)\tau}\bigr), \qquad i = 1,\dots,w-(m-1)\tau ,
+\]
+with embedding dimension $m$ and delay $\tau$~\cite{takens1981}. A periodic signal traces a closed curve in this space, so it leaves a long $H_1$ bar. The size and roundness of that loop depend on the amplitude, the period, the window length and $\tau$~\cite{A05}. TAME~\cite{D02} and Fluent Bit's \code{tda} processor~\cite{fluentbit_pr11250} both use $m=3$, $\tau=1$, and so do we (Section~\ref{sec:prereg}). With $w=60$, each window gives 58 points.
+Our F3 embeds all 38 SMD channels \emph{jointly}: each 60-step window becomes one cloud of 58 points in 114 dimensions, with one $H_0$ and one $H_1$ diagram per window.
+
+Other constructions appear in the literature:
+\begin{itemize}
+  \item TADA~\cite{H04} builds its filtration from the dependence structure \emph{between channels} within a window, rather than from a delay embedding. \fillin{confirm against the \code{tdaad} source at the pinned commit}
+  \item \textbf{Mapper}~\cite{A07} covers the range of a ``lens'' function with overlapping intervals, clusters the points in each interval and links clusters that share points. The result is a graph for visual exploration, not a detector.
+  \item \textbf{Zigzag persistence}~\cite{I01} tracks classes through a \emph{sequence} of spaces that can both grow and shrink, such as the hypergraph of who talks to whom in consecutive windows. I03~\citep{I03} uses it on network flows.
+\end{itemize}
+
+\subsection{What a topological summary can see}
+\label{sec:cansee}
+Table~\ref{tab:see} applies the invariance argument to the anomaly types we inject in E5 (Section~\ref{sec:prereg}). It reasons about a Rips summary of one window, with every point inside the window. Two conclusions follow.
+\begin{itemize}
+  \item \textbf{Volume and identity.} Changes of level, size or identity are either invisible to topology or visible to much cheaper statistics. This is the basis of P2.
+  \item \textbf{Shape.} Changes of rhythm and coupling \emph{are} visible to topology. Because F3 embeds the channels jointly, this includes S2 and S3. But simple structure features, such as autocorrelation, spectral peaks and correlation matrices, see them too. P1 therefore asks whether topology adds value \emph{beyond those features}, and that is why our baseline F2 includes them.
+\end{itemize}
+
+\begin{table}[ht]
+\centering\small
+\caption{What a Vietoris--Rips summary of a delay-embedded window can see, by anomaly type. ``Cheap feature'' names a non-topological statistic in our F1/F2 sets that responds to the same change. This is a reasoning aid, not a result.}
+\label{tab:see}
+\begin{tabularx}{\linewidth}{@{}L{2.3cm}L{2.6cm}YL{2.8cm}@{}}
+\toprule
+Type & Change & Effect on the diagram & Cheap feature that also responds \\
+\midrule
+Volume (V1) & Level shift over the whole window & None: the cloud is translated, and translation leaves the diagram unchanged & Mean \\
+Volume (V1) & Level shift starting mid-window & The cloud splits into two groups, giving one long $H_0$ bar & Mean, variance \\
+Volume (V2) & A few large spikes & Outlying points give long-lived $H_0$ bars & Maximum, variance \\
+Volume (V3) & Spread scaled by $c$ around the mean & Every birth and death scales by $c$; nothing changes if summaries are scale-normalised & Variance \\
+Shape (S1) & Period changed & The loop in the embedding changes size and shape & Spectral peak, autocorrelation \\
+Shape (S2) & One coupled channel phase-shifted & Visible only if the channels are embedded \emph{jointly}; a per-channel embedding of a shifted sine is unchanged & Lagged cross-correlation, correlation summary \\
+Shape (S3) & Coupling broken; marginal kept & Joint cloud loses its structure; a per-channel cloud changes little & Correlation summary \\
+Identity & Activity tied to a specific host or port & None: relabelling vertices leaves topology unchanged & Per-destination counts \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Cost.} The number of Rips simplices grows quickly with the number of points and the maximum dimension. With 58 points and homology up to $H_1$, one window takes well under a second in Ripser; measured costs are in Section~\ref{sec:exp}. The cost matters more for streaming claims (rubric item R7, Section~\ref{sec:rubric}), where many windows per second are needed.

@@ -1,0 +1,90 @@
+\section{Code-audit findings}
+\label{sec:code}
+
+Papers describe their evaluation in a few sentences, but the released code is what produces the numbers. We read six repositories at pinned commits (Table~\ref{tab:code}). Three of them come from the core papers (TAME, TopoGDN and MSF-IDS). The other three are tools we re-test: TADA's implementation \code{tdaad}, PHANTOM, and Fluent Bit's \code{tda} processor.
+
+Every finding below describes what the \emph{released code} does at the stated commit, with file and line numbers so that anyone can check it. None of it is a claim about what the authors ran for their papers.
+
+\begin{table}[ht]
+\centering\small
+\caption{Summary of the code audit. ``Test information'' means test labels, or statistics computed from the test set, used before scoring.}
+\label{tab:code}
+\begin{tabularx}{\linewidth}{@{}lllY@{}}
+\toprule
+Project & Paper & Commit & Main finding \\
+\midrule
+TAME & D02 & \code{e77c0d9} & Threshold falls back to the test anomaly rate; ``TAME (best)'' is the best detector chosen by test AUROC \\
+TopoGDN & D04 & \code{2b8df3b} & Default report is the best F1 over thresholds scored on test labels (inherited from GDN) \\
+MSF-IDS & N03 & \code{bb8ccf5} & Random timestamps serve as the persistence filtration on NetFlow data; labels are used while training \\
+Fluent Bit \code{tda} & -- & \fillin{\code{25ea7e1}?} & Reported $\beta_k$ counts finite bars only, contrary to its comment; gauges are differenced \\
+\code{tdaad} (TADA) & H04 & \code{d103a2c} & README quick-start example fails \\
+PHANTOM & -- & \code{8caa25a} & No evaluation problem found (described for E2) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{TAME (D02)}
+TAME~\cite{D02,tame_repo} turns each SMD window into a persistence image, then scores it with shallow detectors. Its repository reports an SMD ROC-AUC of 0.808, against 0.691 for TranAD. At commit \code{e77c0d9}:
+\begin{enumerate}
+  \item For SMD, PSM and SMAP/MSL, all training labels are set to 0 (\code{utils/data_loaders.py} L52, L176, L224, L268). The validation set is the last 18\% of the training pool, so it contains only normal windows (\code{utils/experiment_core.py} L84--87).
+  \item When validation lacks one of the two classes, the threshold falls back to the $1-\textit{expected\_rate}$ quantile of the training scores (\code{experiment_core.py} L105--112). Here \textit{expected\_rate} is the anomaly rate of the \emph{test} labels (L216). The baselines get the same rule (\code{utils/baseline_core.py} L50).
+  \item ``TAME (best)'' is the maximum mean \emph{test} AUROC across four detectors and their settings, while each baseline is a single model (\code{consolidate.py} L66--71). The notebooks choose the plotted detector the same way.
+  \item The README states that thresholds use ``validation-only threshold selection (never test labels)'' (\code{README.md} L40).
+\end{enumerate}
+\textbf{What follows.} On these datasets, every threshold-based metric (F1, precision, recall) uses the test anomaly rate, for TAME and the baselines alike. AUROC and AUPRC do not depend on the threshold. But the headline AUROC is a best-of-four pick made on the test set, compared against single baselines. That selection favours TAME. E2 removes both effects: our validation threshold replaces the fallback, and the Isolation Forest variant is fixed in advance.
+
+\subsection{TopoGDN (D04)}
+At commit \code{2b8df3b}~\cite{D04}:
+\begin{enumerate}
+  \item The default reporting mode is \code{-report best} (\code{main.py} L349). In that mode, F1 is computed at 400 thresholds against the \emph{test} labels and the maximum is reported (\code{evaluate.py} L129--143).
+  \item Error scores are normalised by the median and inter-quartile range of the test-set errors (\code{evaluate.py} L48--60). These come from test inputs, not labels, so the normalisation is transductive rather than a label leak.
+  \item The original GDN code has the same default (d-ailin/GDN at \code{9853899}, \code{main.py} L216).
+\end{enumerate}
+The paper describes a validation-based threshold (its Sec.~3.6). It does not say which mode produced its main table.
+
+\textbf{What follows.} With the default script, the F1 values are best cases chosen with test labels. The paper's margin over TranAD is under one F1 point on SMD and MSL, so it depends on how TranAD was thresholded. The practice is inherited from GDN and common in this benchmark line, so we report it as a field-level issue, not one specific to TopoGDN.
+
+We did not re-run TopoGDN: its build fails and it requires a GPU. \fillin{one line on the build error, from the logs}
+
+\subsection{MSF-IDS (N03)}
+At commit \code{bb8ccf5}~\cite{N03}:
+\begin{enumerate}
+  \item For the NetFlow (NF) datasets, every record gets a random timestamp in $[0, 86400)$ seconds, and records are then sorted by it (\code{Data/datasets_NF.py} L57--71, L105, L120).
+  \item Edge timestamps are the filtration values for persistent homology (\code{Spatial-Frequency Encoders/Spatial Encoder_NAPH.py} L48--52). The diagram becomes a fixed, not learned, persistence image (L52, L65).
+  \item The CIC datasets keep their real timestamps (\code{Data/datasets_CIC.py} L56--57, L74--76).
+  \item The script builds only a training loader. It evaluates on that same stream, after matching clusters to the true labels (\code{main_Intrusion Detector.py} L76, L353, L384--399). The labels are also used for early stopping (F1 above 0.5) and to accept self-expressive iterations (accuracy above 0.8). \fillin{line numbers}
+\end{enumerate}
+\textbf{What follows.} On the NF datasets, the filtration orders edges at random, so the persistence features carry no temporal information. Any benefit reported on those datasets cannot come from temporal topology. Evaluating clustering on the stream it was fitted on is common in unsupervised work, but it is not a held-out detection test.
+
+\subsection{Fluent Bit \texttt{tda} processor}
+\label{sec:fluentbit}
+Fluent Bit, a widely deployed log and metrics agent, ships a \code{tda} processor~\cite{fluentbit_pr11250}, and we found no published evaluation of it. It works as follows:
+\begin{enumerate}
+  \item it reads metrics only;
+  \item it applies a signed $\log(1+|x|)$ transform;
+  \item it delay-embeds with $m=3$ and $\tau=1$ over a 60-sample window;
+  \item it computes Rips persistence at nine quantile radii and keeps the radius with the largest $\beta_1$;
+  \item it emits $\beta_0$, $\beta_1$ and $\beta_2$ as gauges.
+\end{enumerate}
+We re-implemented it literally as F5. Doing so revealed two behaviours.
+
+\begin{enumerate}
+  \item \textbf{What ``$\beta_k$'' counts.} A Betti number at radius $r$ counts the classes \emph{alive} at $r$. The wrapper's comment says it counts the infinite bars, meaning the classes still alive at the chosen radius. The code does the opposite. The Ripser wrapper marks infinite bars with death $=-1$, and the counting loop then drops every bar with death $\le$ birth, so all infinite bars are discarded. Only \emph{finite} bars with persistence of at least $10^{-3}$ are counted, and those are classes that had already died by the chosen radius. So a loop that is still open at the chosen radius is never counted. The reported $\beta_1$ is therefore not the Betti number at that radius, and the radius scan maximises this other quantity. \fillin{wrapper file name and lines, from docs/code\_verification.md \S4}
+  \item \textbf{Gauges are differenced.} The rate step in \code{tda.c} (L561--569) runs on every metric type, so gauges such as memory use or CPU percentage are differenced as if they were counters.
+\end{enumerate}
+\textbf{What follows.} The processor's outputs are well defined, but they do not mean what their names and comments suggest. We keep F5 faithful to the code, including both behaviours. It is reported descriptively and enters no verdict.
+
+\subsection{\texttt{tdaad} (TADA) and PHANTOM}
+\begin{itemize}
+  \item \textbf{\code{tdaad}}~\cite{tdaad_repo} is the public implementation of TADA~\cite{H04}. At \code{d103a2c}, the quick-start example in its README fails. The example has three sensors, and three points cannot carry an $H_1$ loop in a Rips filtration, because the triangle fills at the same scale as its last edge. \fillin{exact error message and where it is raised} We call the library directly with default parameters in E2.
+  \item \textbf{PHANTOM}~\cite{phantom_repo} at \code{8caa25a} (BSD licence) uses Ripser with $H_0$ only. It scores a window by the Wasserstein distance (\code{main.py}; implementation note 42) between a baseline diagram and the diagram of the baseline plus the new window, and it updates the baseline as it goes. This is the scheme described for the PNNL work B06~\citep{B06}. We found no evaluation problem in it. Because it uses $H_0$ only, it measures changes in clustering and spread, not loops.
+\end{itemize}
+
+\subsection{Summary}
+In three of the six projects, information from the test set enters before scoring:
+\begin{itemize}
+  \item TAME uses the test anomaly rate and picks its detector by test AUROC;
+  \item TopoGDN uses test-optimal thresholds;
+  \item MSF-IDS uses labels to stop training.
+\end{itemize}
+In two more, the topological quantity is not what its description says. MSF-IDS uses a random filtration, and Fluent Bit counts dead bars. None of this shows that the papers' conclusions are wrong. It does show that published numbers cannot be read as fair evidence for topology without re-running the code under clean rules, which is what E1 and E2 do. \fillin{if the authors were contacted, add the date and any reply}

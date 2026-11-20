@@ -2,6 +2,23 @@
 
 Updated at the end of every task. Latest entry first.
 
+## 2026-11-20: E4 on CTU-13 built (worktree `dev`; nothing run beyond one dry run)
+
+**Done**
+- Open details recorded **before** coding: notes 49-66 in `docs/implementation_notes.md`.
+- `src/ctu13.py` (flows, host windows, labels, graphs), `src/features_ctu13.py` (graph features, Z-control, Z), `src/e4.py` (stage 1 table per scenario, stage 2 leave-one-scenario-out folds), `scripts/run_e4.py`, `scripts/summarize_e4.py`, `configs/e4_behaviours.yaml`. 16 new tests, all pass.
+- **Zigzag works** with `dionysus` 2.2.3 (already installed, no system package). The 3-day timebox started 2026-11-20; the §7 fallback is not needed. Z at window t uses only windows <= t (tested against a truncated recomputation).
+- Dry run: scenario 7 stage 1 only (114k flows, 0.4 s): 16 windows (2 positive, 14 normal), no NaN. Stage 2 not run (needs all 12 scenarios).
+
+**Next**
+1. Merge master into dev if not yet done (`summarize_smd.py`), commit, then run E4 in the main folder.
+2. After the run: check `n_windows_edge_capped` in the `by_scenario/*.meta.json` files (graph cap, note 56).
+
+**Open decisions (Anirudh)**
+- Note 61: scenario behaviour types are from README text; six scenarios are Unknown. Shape and Volume cells have only 2 scenarios each (verdict will probably be Inconclusive).
+- Notes 53, 56, 59: raw-count channels, 2,000-edge cap, trailing 5 windows for Z.
+- Scenario 7 has only 2 positive windows, and several scenarios are short: per-fold PR-AUC will be noisy.
+
 
 
 

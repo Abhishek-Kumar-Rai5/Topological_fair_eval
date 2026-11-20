@@ -1,0 +1,33 @@
+\section{Problem and question}
+\label{sec:intro}
+
+\subsection{The claim}
+Topological data analysis (TDA) describes the shape of data. Its main tool, persistent homology, records which connected pieces and loops appear in the data across scales and how long each one survives~\cite{edelsbrunner2002persistence,A01,carlsson2009topology}. Over the past decade, TDA has been applied to security and systems telemetry: darknet packets, network flows, host logs, malware call graphs and server metrics. These papers usually make the same argument. Attacks and faults change the \emph{structure} of the data: its rhythm, the coupling between signals, or the way hosts connect. Topology is meant to capture that structure where counts and averages cannot.
+
+\subsection{The problem}
+A detector that uses topological features can perform well for many reasons other than topology. The learner may be stronger. It may have been tuned more. The threshold may have been chosen with test labels. The benchmark itself may make detection easy. Only one experimental design isolates topology's contribution: keep the data, split, detector and tuning fixed, and \emph{replace} the topological features with cheap ones. We call this a \emph{swap test}.
+
+Removing the topology branch from a model is not enough. Removal shows that the model needs \emph{some} extra input. It does not show that topology beats a cheap input of the same size. Comparing against other people's systems is weaker still, because the learner, the tuning and often the data split differ too.
+
+\subsection{Research question}
+\begin{quote}
+\emph{Does topology add detection value over cheap features when evaluation is fair, and if it does, for which kinds of anomaly?}
+\end{quote}
+We split this question into three predictions, fixed before any data was opened (Section~\ref{sec:prereg}):
+\begin{description}
+  \item[P1] Topology adds value on \emph{shape} anomalies: changes in rhythm, coupling or connectivity.
+  \item[P2] Topology adds \emph{no} value on \emph{volume} anomalies (changes in rate or magnitude) or \emph{identity} anomalies (a specific host or port).
+  \item[P3] Published TDA results shrink under fair evaluation.
+\end{description}
+
+\subsection{Contributions}
+\begin{enumerate}
+  \item \textbf{Literature audit.} We screened 95 records and scored the 32 core applications on a 13-item rubric (R1--R13). Only 4 of the 32 swap-test topology: 2 lose, 1 ties and 1 shows a weak win. No paper tests against an adversary who knows the method (Section~\ref{sec:audit}).
+  \item \textbf{Code audit.} We read the released code of six projects at pinned commits. Three releases use test information when setting thresholds, choosing detectors or stopping training. One uses random timestamps as its filtration. Fluent Bit's \code{tda} processor counts something other than what its comment states (Section~\ref{sec:code}).
+  \item \textbf{Fair re-evaluation.} We re-test the claims under a preregistered protocol, using released code and public data: SMD for systems and CTU-13 for security (Section~\ref{sec:exp}).
+  \item \textbf{Mechanism test.} We inject controlled shape and volume anomalies into SMD to test \emph{why} topology helps or fails (Sections~\ref{sec:exp} and~\ref{sec:why}).
+\end{enumerate}
+
+\paragraph{What this report does not claim.} We do not propose a new detector. We do not claim that topology is useless. The claim under test is narrower: that topological features add detection value \emph{beyond cheap features}, under evaluation rules that avoid test leakage.
+
+\paragraph{Organisation.} Section~\ref{sec:background} explains what TDA can and cannot capture. Section~\ref{sec:method} describes the audit method and the preregistered protocol. Sections~\ref{sec:audit} and~\ref{sec:code} report the literature and code audits. Section~\ref{sec:exp} reports experiments E1--E5. Section~\ref{sec:why} interprets them through the shape-versus-volume lens, and Section~\ref{sec:limits} lists limitations.

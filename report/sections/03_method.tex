@@ -1,0 +1,215 @@
+\section{Method}
+\label{sec:method}
+
+The project has two halves (Figure~\ref{fig:pipeline}). The audit asks what the published evidence shows. The re-evaluation tests the claims ourselves under rules that were fixed before any data was opened.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=1.05cm, text width=2.15cm, fill=#1},
+  box/.default=white, >={Stealth[length=2mm]}, node distance=0.45cm]
+  \node[box=blue!6] (s) {Search\\95 records};
+  \node[box=blue!6, right=of s] (c) {Screening\\32 core};
+  \node[box=blue!6, right=of c] (r) {Rubric\\R1--R13 + axes};
+  \node[box=blue!6, right=of r] (k) {Code audit\\6 repositories};
+  \node[box=orange!10, below=0.9cm of k] (p) {Preregistration\\tag \code{prereg-v3}};
+  \node[box=orange!10, left=of p] (d) {Data access\\SMD, CTU-13};
+  \node[box=orange!10, left=of d] (e) {Experiments\\E1--E5};
+  \node[box=orange!10, left=of e] (v) {Verdicts\\P1--P3};
+  \draw[->] (s) -- (c); \draw[->] (c) -- (r); \draw[->] (r) -- (k);
+  \draw[->] (k) -- (p); \draw[->] (p) -- (d); \draw[->] (d) -- (e); \draw[->] (e) -- (v);
+  \node[font=\footnotesize\itshape, above=0.05cm of c, xshift=1.3cm] {audit (Sections~\ref{sec:audit}--\ref{sec:code})};
+  \node[font=\footnotesize\itshape, below=0.05cm of d, xshift=-1.3cm] {re-evaluation (Sections~\ref{sec:exp}--\ref{sec:why})};
+\end{tikzpicture}
+\caption{Project pipeline. The audit (top) motivates the preregistered re-evaluation (bottom). No data was opened before the preregistration was committed and tagged.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Search}
+\label{sec:search}
+The search ran in three rounds:
+\begin{enumerate}
+  \item \textbf{Initial audit} (search cut-off 14 October 2026): 76 records.
+  \item \textbf{Round 2} (13--15 November): 119 distinct logged queries, namely 69 web searches, 23 OpenAlex, 11 Semantic Scholar API, 10 publisher sites, 5 arXiv and 1 DBLP. It included separate sweeps for network security, host security and systems telemetry, plus a Chinese-language and boundary pass.
+  \item \textbf{Round 3} (15--16 November): forward citations from seven seed papers, plus targeted gap searches.
+\end{enumerate}
+The final set has 95 records. Semantic Scholar refused or rate-limited some requests, so citation expansion in round 2 was incomplete. The search for earlier critical reviews was also not completed. The closest existing reviews are Davies~\cite{P01}, a catalogue of TDA in cybersecurity, and Georgiou et al.~\cite{georgiou2026tda}, a broad TDA survey that gives security one short section. Neither audits evaluation practice. Our claim that no critical review exists therefore has medium-low confidence.
+
+\paragraph{Use of AI assistants.} Searches and first-pass extraction were done with AI research assistants (Claude) working from fixed written protocols. Each number in the records names its source table or section. Each claim is marked as \emph{Author} (what the paper says) or \emph{Assessment} (our judgement). The author's own check is the blind re-scoring in Section~\ref{sec:recheck}. \fillin{confirm wording; full AI-use note in an appendix}
+
+\subsection{Screening and scope}
+\label{sec:scope}
+\begin{itemize}
+  \item \textbf{Core security clusters.} S1 network flows and packets, S2 darknet traffic, S3 host logs, S4 activity and provenance graphs, S5 malware, S6 encrypted-traffic and IoT fingerprinting, S7 wireless networks, S8 DNS.
+  \item \textbf{Core systems clusters.} I1 server and cloud metrics, I2 big-data jobs, I3 HPC, I4 traces and serverless, I5 OS and hardware, I6 network operations.
+  \item \textbf{Boundary clusters.} These are kept out of the core counts: B1 cyber-physical systems and the grid, B2 ledgers, B3 software artefacts, B4 poisoning and federated learning, and social-media bots.
+\end{itemize}
+
+A record is \textbf{included as core} only if it meets both conditions:
+\begin{enumerate}
+  \item it computes a genuine topological invariant or construction: persistent homology and its summaries, Mapper or Reeb graphs, zigzag or multiparameter persistence, directed constructions, sheaf or Hodge methods, or homological deep learning;
+  \item it applies that invariant to in-scope data.
+\end{enumerate}
+
+Three terminology traps were screened out: ``topology'' meaning a service map or attack graph, ``persistence'' in the temporal sense, and ordinary graph metrics labelled as topological.
+
+Table~\ref{tab:screening} gives the outcome. Of the 32 core papers, 24 were read in full and 8 only as abstracts, because the full text was closed or unavailable.
+
+\begin{table}[ht]
+\centering\small
+\caption{Screening outcome for the 95 records.}
+\label{tab:screening}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Status & Records \\
+\midrule
+Core application (S1--S8, I1--I6) & 32 \\
+Boundary application (B1--B4, social bots) & 14 \\
+Not an application (theory, method, review or benchmark context) & 43 \\
+Core method on modelled data only (E02) & 1 \\
+Candidate, inclusion unverified (B10) & 1 \\
+Merged into a later version (D05 into D02) & 1 \\
+Excluded: no homology computed (J06); Mapper described but never shown on data (D03) & 2 \\
+Out of scope (M01, wind turbines) & 1 \\
+\midrule
+Total & 95 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Rubric and coding axes}
+\label{sec:rubric}
+Each core paper was scored on the 13 items in Table~\ref{tab:rubric}, each as Y (yes), P (partial), N (no), U (unknown: not reported, or text not readable) or NA (not applicable). The items follow established pitfalls in machine learning for security~\cite{sommer2010closed,arp2022dos} and in time-series anomaly benchmarks~\cite{Q04,kim2022rigorous}.
+
+\begin{table}[ht]
+\centering\small
+\caption{Rigour rubric applied to each core paper.}
+\label{tab:rubric}
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+\toprule
+Item & Criterion \\
+\midrule
+R1 & Matched non-topological baseline: same data, split, learner and tuning \\
+R2 & Replacement ablation: topology \emph{swapped} for cheap features, not merely removed \\
+R3 & Leakage-safe split: separated by time or entity; preprocessing and thresholds fitted on training data only \\
+R4 & Threshold chosen without test labels or test prevalence \\
+R5 & Prevalence-aware metrics: PR-AUC, precision at fixed recall, or false alarms per unit time \\
+R6 & Uncertainty measured across independent units (hosts, days, scenarios), not only across seeds \\
+R7 & Cost reported; for ``real-time'' claims, latency at a stated event rate \\
+R8 & Robustness tests: noise, drift or missing data \\
+R9 & An adversary who knows the method \\
+R10 & Known benchmark flaws acknowledged, or corrected data used \\
+R11 & Interpretation claims supported by evidence \\
+R12 & Code released \\
+R13 & Data available \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Each core paper was also coded on four axes:
+\begin{itemize}
+  \item \textbf{OUT}: Helped, Tied, Lost, Mixed or Untested, against the \emph{best non-topological comparator in the same paper}. ``Tied'' means within the reported noise, or less than one point apart with no statistical test.
+  \item \textbf{USE}: Detection, Exploration (visual analytics or triage), Efficiency (sampling, data reduction or augmentation), or Component (persistent homology inside a larger learned model).
+  \item \textbf{CHG}: what the target anomaly mainly changes: Shape, Volume, Identity, Content, Mixed or Unclear.
+  \item \textbf{ISO}: how the paper isolates topology's contribution: Replacement (a swap test), Removal-only, or Not-isolated.
+\end{itemize}
+For reporting, papers are grouped by how close they came to a swap test: \textbf{A} swapped; \textbf{B} topology only removed; \textbf{C} compared only with other people's systems; \textbf{D} no comparison; \textbf{E} known only from the abstract or from code.
+
+\subsection{Self re-check}
+\label{sec:recheck}
+To estimate coding reliability, the author re-scored 7 core papers blind on R1--R13 and OUT/ISO, without looking at the existing scores. Agreement was \fillin{xx\%} of items (\fillin{n of N}). Disagreements were \fillin{resolved how; what changed}.
+
+\subsection{Code audit}
+\label{sec:codemethod}
+For papers with released code, we read the repository at a fixed commit and recorded the file and line numbers behind every claim. Every statement in Section~\ref{sec:code} describes what the \emph{released code} does, not what the authors ran for their paper. We do not call any result invalid. We state what the code does and what follows from it.
+
+\subsection{Preregistered re-evaluation}
+\label{sec:prereg}
+The experiment plan was written down and committed \emph{alone} to a public repository, tagged \code{prereg-v3}, before any SMD or CTU-13 data was opened~\cite{nosek2018prereg}. \fillin{commit hash 773d00d and tag date; confirm the tag is on the remote} Version 3 replaced version 2 (16 November) on 19 November, still before data access. The change log is kept in the preregistration. Any change after data access goes into a deviations log with its date, reason and affected results, and both the original and the amended results are reported.
+
+\paragraph{Datasets.}
+\begin{itemize}
+  \item \textbf{SMD}~\cite{su2019smd}: 28 server machines, 38 metrics each, with the official train and test files.
+    \begin{itemize}
+      \item Training data is treated as normal.
+      \item Validation is the last 20\% of each machine's training data.
+      \item Windows are 60 samples long, with a step of 10.
+      \item A window is \emph{positive} if a labelled point falls in its final 10 samples, and \emph{normal} if it contains no labelled point; any other window is dropped.
+    \end{itemize}
+  \item \textbf{CTU-13}~\cite{garcia2014ctu}: labelled bidirectional NetFlow from botnet captures.
+    \begin{itemize}
+      \item Windows are \emph{per host}: 10-second bins, 60 bins per window, a step of 30 bins.
+      \item A window is \emph{positive} if it belongs to an infected host and contains a botnet flow, and \emph{normal} if it belongs to a labelled normal host, contains a normal flow and contains no botnet flow.
+      \item Splits are leave-one-scenario-out.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Feature sets.} All sets are computed on the same windows, with every scaler and every PCA fitted on training data only.
+\begin{itemize}
+  \item \textbf{F1 Simple}: per-channel sum, mean, variance and number of unique values. CTU-13 adds flow, byte, packet, destination-IP and destination-port counts.
+  \item \textbf{F2 Simple-structure}:
+    \begin{itemize}
+      \item correlation summaries;
+      \item periodicity: FFT peak share and maximum autocorrelation;
+      \item PCA reconstruction error.
+    \end{itemize}
+    CTU-13 adds destination-graph components, cycle rank and degree statistics.
+  \item \textbf{F3 Topology}: delay embedding ($m=3$, $\tau=1$) of all channels jointly (58 points in 114 dimensions per SMD window), Rips persistence in $H_0$ and $H_1$, and 32 fixed summaries (bar counts, lifetime statistics, persistent entropy, and Betti curves at 10 multiples of the median pairwise distance). Nothing is tuned.
+  \item \textbf{F5 Fluent Bit-style}: replicates the \code{tda} processor to output $\beta_0,\beta_1,\beta_2$ (exploratory; Section~\ref{sec:fluentbit}).
+  \item \textbf{Z and Z-control} (CTU-13): zigzag persistence over per-host hypergraphs, against I03's own control of edges, vertices, components and diameter.
+\end{itemize}
+
+\paragraph{Detector, threshold and metrics.}
+\begin{itemize}
+  \item \textbf{Detector.} Every feature set uses the same Isolation Forest~\cite{liu2008iforest} with fixed defaults: 300 trees and automatic sample size. It is trained on normal windows and run with 5 seeds. Nothing is tuned, because SMD validation data contains no anomalies, so PR-AUC cannot be used to select settings.
+  \item \textbf{Threshold.} The alarm threshold is set at a 1\% false-alarm rate on validation windows. Test labels are never used, and there is no point adjustment~\cite{kim2022rigorous}.
+  \item \textbf{Metrics.} The primary metric is PR-AUC. We also report recall at the threshold, false alarms per day (consecutive alarm windows count as one event), ROC-AUC (for comparison with published numbers) and runtime per window.
+\end{itemize}
+
+\paragraph{Experiments.} Table~\ref{tab:exps} lists the experiments.
+
+\begin{table}[ht]
+\centering\small
+\caption{Preregistered experiments.}
+\label{tab:exps}
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+\toprule
+ID & Description \\
+\midrule
+E1 & TAME~\cite{D02} as released, unchanged, compared with its reported SMD ROC-AUC of 0.808. Timebox: 2 days. \\
+E2 & Fair re-test on SMD of TADA~\cite{H04,tdaad_repo}, PHANTOM~\cite{phantom_repo} and TAME. TAME is fixed in two ways: our threshold rule replaces its test-prevalence threshold, and its Isolation Forest variant is chosen \emph{in advance}. These run alongside our F1+F2 and F1+F2+F3 pipelines. \\
+E3 & Swap test on SMD with the same detector: F1, F1+F2, F1+F3, F1+F2+F3 and F5. \\
+E4 & CTU-13: F1+F2 against F1+F2+F3, and Z against Z-control. Zigzag timebox: 3 days, with a preregistered fallback. \\
+E5 & Controlled injections into normal SMD test segments, three shape types (S1 period change, S2 phase shift, S3 correlation break) and three volume types (V1 level shift, V2 spikes, V3 variance scaling), each at three magnitudes. Each type compares F1+F2 against F1+F2+F3. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Decision rules.} The main gain is
+\[
+  \Delta = \text{PR-AUC}(\text{F1+F2+F3}) - \text{PR-AUC}(\text{F1+F2}),
+\]
+and the swap gain is
+\[
+  \Delta_s = \text{PR-AUC}(\text{F1+F3}) - \text{PR-AUC}(\text{F1+F2}).
+\]
+Confidence intervals come from a 95\% cluster bootstrap (2{,}000 resamples), clustered over machines (SMD) or scenarios (CTU-13), after averaging across seeds. A cell is judged:
+\begin{itemize}
+  \item \textbf{Helps} if $\Delta>0$ and the interval excludes 0;
+  \item \textbf{No added value} if the whole interval lies inside $\pm 0.02$;
+  \item \textbf{Inconclusive} otherwise, including any cell with fewer than 20 positive or 20 normal test windows.
+\end{itemize}
+The predictions are judged as follows:
+\begin{itemize}
+  \item \textbf{P1} is supported if $\Delta$ ``helps'' for at least 2 of the 3 shape types at the decision magnitude, and refuted if at least 2 show ``no added value''.
+  \item \textbf{P2} is supported if all three volume types show ``no added value''. It is refuted if any volume type ``helps'' with $\Delta \ge 0.02$ after Bonferroni correction.
+  \item \textbf{P3} compares TAME under E2 with E1.
+\end{itemize}
+F5, TADA and PHANTOM are reported descriptively and enter no verdict.
+
+\paragraph{Deviations so far.}
+\begin{itemize}
+  \item CTU-13 scenario 10 (capture 51) ships without a \code{.binetflow} file, so it is excluded and 12 scenarios remain.
+  \item F5 follows the literal \code{tda.c} code, including its differencing of gauges (Section~\ref{sec:fluentbit}). This was logged before any results were seen.
+\end{itemize}
+The full log is in Appendix~\ref{app:deviations}.

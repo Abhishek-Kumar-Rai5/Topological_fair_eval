@@ -1,0 +1,135 @@
+\section{Experiments E1--E5}
+\label{sec:exp}
+
+\fillin{Remaining cells are filled in from \code{results/} as runs finish. Every number must come from a result file with its \code{.meta.json} (commit, seeds, versions).}
+
+\subsection{Setup as run}
+\begin{itemize}
+  \item \textbf{Hardware:} \fillin{CPU, cores, RAM}. Runtimes are per window on one thread and include both feature extraction and scoring.
+  \item \textbf{Library versions:} \fillin{from \code{docs/external_versions.md}}.
+  \item \textbf{Pinned commits:} TAME \code{e77c0d9}, PHANTOM \code{8caa25a}, \code{tdaad} \code{d103a2c}, Fluent Bit \fillin{commit}.
+  \item \textbf{E3 and E2 (our pipelines):} run at commit \code{9c28f8f} with no uncommitted changes, on 28 machines with 5 seeds. Two laptop shutdowns interrupted the run. Each machine's results are saved as soon as it finishes, so the run resumed from the saved machines. One machine whose file was cut off mid-write was deleted and re-run.
+  \item \textbf{Test windows:} 3{,}244 positive and 65{,}819 normal across all machines, so positives are 4.7\% of test windows.
+  \item \textbf{Data facts checked at access time} (preregistration \S10): \fillin{SMD train/test lengths; SMD sampling interval checked against~\cite{su2019smd} (1 minute assumed, from a secondary source; it affects only false alarms per day); CTU-13 hosts per scenario}.
+\end{itemize}
+
+\subsection{E1: TAME as released}
+\begin{table}[ht]
+\centering\small
+\caption{E1: TAME's released code, unchanged, against its reported SMD result.}
+\label{tab:e1}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+ & Reported & Our run \\
+\midrule
+SMD ROC-AUC, ``TAME (best)'' & 0.808 & \pending \\
+SMD AUPRC, ``TAME (best)'' & 0.462 & \pending \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{E3: swap test on SMD}
+Table~\ref{tab:e3} gives the swap test. Adding topological features to the same Isolation Forest raises PR-AUC, and both preregistered comparisons are ``Helps'':
+\begin{itemize}
+  \item the main gain is $\Delta = +0.054$ [0.035, 0.076];
+  \item the swap gain is $\Delta_s = +0.067$ [0.041, 0.097].
+\end{itemize}
+The gain is consistent across machines: $\Delta > 0$ on 23 of 28 machines, $\Delta < 0$ on 4, and $\Delta = 0$ on 1. Adding topology costs about 1.6\,ms per window.
+
+These are overall results on real SMD anomalies. SMD does not label anomaly types, so they say nothing yet about \emph{which} anomalies topology helps with, and they do not enter P1 or P2. That is E5's job.
+
+The Fluent Bit-style features (F5) score far below every other set. They are reported descriptively and enter no verdict.
+
+\begin{table}[ht]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{E3: the same Isolation Forest with different feature sets on SMD. Values are means over 28 machines (5 seeds averaged) with 95\% cluster-bootstrap intervals. Recall is at the 1\% false-alarm threshold. FA/day is false alarms per day, with consecutive alarm windows counted as one event. Runtime is the mean per window, on one thread. Intervals for recall and false alarms are in \code{results/E3}.}
+\label{tab:e3}
+\begin{tabular}{@{}lccccr@{}}
+\toprule
+Feature set & PR-AUC & ROC-AUC & Recall & FA/day & ms/win. \\
+\midrule
+F1 & 0.482 [0.411, 0.559] & 0.858 [0.822, 0.893] & 0.49 & 1.44 & 0.07 \\
+F1+F2 & 0.461 [0.390, 0.540] & 0.848 [0.808, 0.887] & 0.45 & 1.79 & 0.59 \\
+F1+F3 & 0.529 [0.458, 0.605] & 0.883 [0.851, 0.912] & 0.54 & 1.56 & 1.70 \\
+F1+F2+F3 & 0.515 [0.443, 0.594] & 0.876 [0.841, 0.907] & 0.53 & 1.85 & 2.21 \\
+F5 (exploratory) & 0.119 [0.093, 0.146] & 0.651 [0.616, 0.685] & 0.10 & 1.66 & 56.0 \\
+\midrule
+\multicolumn{6}{@{}l}{Preregistered comparisons (PR-AUC)} \\
+$\Delta$ = (F1+F2+F3) $-$ (F1+F2) & \multicolumn{5}{l}{+0.054 [0.035, 0.076] \quad \textbf{Helps}} \\
+$\Delta_s$ = (F1+F3) $-$ (F1+F2) & \multicolumn{5}{l}{+0.067 [0.041, 0.097] \quad \textbf{Helps}} \\
+\midrule
+\multicolumn{6}{@{}l}{Exploratory, not preregistered: gain over F1 alone (PR-AUC)} \\
+(F1+F2) $-$ F1 & \multicolumn{5}{l}{$-$0.021 [$-$0.035, $-$0.006]} \\
+(F1+F3) $-$ F1 & \multicolumn{5}{l}{+0.047 [0.025, 0.072]} \\
+(F1+F2+F3) $-$ F1 & \multicolumn{5}{l}{+0.034 [0.012, 0.056]} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Exploratory: is the gain just a weak baseline?} The baseline F1+F2 scores \emph{below} F1 alone: adding the simple structure features (F2) slightly hurts this detector. So we also measured each set against F1, as an exploratory check that was not preregistered. Topology still helps there: (F1+F3) $-$ F1 is +0.047 [0.025, 0.072]. The preregistered gain is therefore not an artefact of a weak baseline. Why F2 hurts is open. One candidate is that Isolation Forest picks split features at random, so features that carry no signal dilute it. \fillin{check before claiming}
+
+\paragraph{For scale only.} TAME's repository reports an SMD ROC-AUC of 0.808, and our cheapest set (F1) reaches 0.858. The window length, window labels and threshold rules differ, so these two numbers are \emph{not} comparable. E1 and E2 make the comparison on equal terms.
+
+\subsection{E2: fair re-test on SMD}
+\begin{table}[ht]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{E2: all methods on the same SMD windows, with the threshold at 1\% false alarms on validation. Our two pipelines are deterministic given the seed, so their rows match E3 exactly. Runtimes are taken from E3, because laptop load differed during the E2 run. Column meanings are as in Table~\ref{tab:e3}.}
+\label{tab:e2}
+\begin{tabular}{@{}lccccr@{}}
+\toprule
+Method & PR-AUC & ROC-AUC & Recall & FA/day & ms/win. \\
+\midrule
+TADA (\code{tdaad}) & \pending & \pending & \pending & \pending & \pending \\
+PHANTOM & \pending & \pending & \pending & \pending & \pending \\
+TAME (fixed) & \pending & \pending & \pending & \pending & \pending \\
+F1+F2 (ours) & 0.461 [0.390, 0.540] & 0.848 [0.808, 0.887] & 0.45 & 1.79 & 0.59 \\
+F1+F2+F3 (ours) & 0.515 [0.443, 0.594] & 0.876 [0.841, 0.907] & 0.53 & 1.85 & 2.21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{E4: CTU-13}
+\begin{table}[ht]
+\centering\small
+\caption{E4: CTU-13, leave-one-scenario-out over 12 scenarios. Supporting evidence only (Section~\ref{sec:limits}).}
+\label{tab:e4}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Comparison & PR-AUC (base) & PR-AUC (with topology) & $\Delta$ [95\% CI] \\
+\midrule
+F1+F2 vs F1+F2+F3 & \pending & \pending & \pending \\
+Z-control vs Z & \pending & \pending & \pending \\
+\bottomrule
+\end{tabular}
+\end{table}
+\fillin{per-behaviour-type cells (shape / volume / identity / mixed), with positive and normal window counts}
+
+\subsection{E5: shape versus volume injections}
+\begin{table}[ht]
+\centering\small
+\caption{E5: injected anomalies at the decision magnitude. $\Delta$ = PR-AUC(F1+F2+F3) $-$ PR-AUC(F1+F2).}
+\label{tab:e5}
+\begin{tabular}{@{}llccl@{}}
+\toprule
+Type & Injection (decision magnitude) & PR-AUC F1+F2 & $\Delta$ [95\% CI] & Verdict \\
+\midrule
+S1 & Period $\times 2$ & \pending & \pending & \pending \\
+S2 & Phase shift $1/4$ period & \pending & \pending & \pending \\
+S3 & Correlation break, fraction 1.0 & \pending & \pending & \pending \\
+V1 & Level shift $+2\sigma$ & \pending & \pending & \pending \\
+V2 & Spikes $5\sigma$ & \pending & \pending & \pending \\
+V3 & Variance $\times 2$ & \pending & \pending & \pending \\
+\bottomrule
+\end{tabular}
+\end{table}
+\fillin{Figure: detection versus magnitude, one panel per type; machines skipped for lack of eligible channels}
+
+\subsection{Verdicts}
+\begin{itemize}
+  \item \textbf{Overall, real SMD anomalies (E3):} topology helps, $\Delta = +0.054$ [0.035, 0.076]. This does not enter P1 or P2.
+  \item \textbf{P1} (topology helps on shape): \pending
+  \item \textbf{P2} (no added value on volume): \pending
+  \item \textbf{P3} (published results shrink): \pending
+\end{itemize}
