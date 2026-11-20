@@ -1,0 +1,7 @@
+machine,type,kind,k,n_requested,n_placed,reason,n_eligible_channels,skipped
+machine-3-5,S1,shape,5,10,10,,12,False
+machine-3-5,S2,shape,5,10,10,,10,False
+machine-3-5,S3,shape,5,10,10,,19,False
+machine-3-5,V1,volume,5,10,10,,23,False
+machine-3-5,V2,volume,5,10,10,,23,False
+machine-3-5,V3,volume,5,10,10,,23,False

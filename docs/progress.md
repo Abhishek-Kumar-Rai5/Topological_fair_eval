@@ -4,6 +4,20 @@ Updated at the end of every task. Latest entry first.
 
 
 
+
+## 2026-11-20 (night): E5b run (exploratory)
+
+**Done**
+- E5b run at commit `c6b2915` (clean tree, `git_dirty` false), 28 machines × 5 seeds, 191 s with `--jobs 4`. `results/E5b/` (`E5b_summary/verdicts.csv`, `E5b_curves.png`, `E5b_placement.csv`). Summary: `scripts/summarize_e5b.py`.
+- **3 of 18 cells count** (baseline ROC-AUC at least 0.7): V1 at 2 and 3 sigma (No added value) and V2 at 8 sigma (Helps, Δ = +0.021 [0.014, 0.029]). The other 15 cells are marked "Baseline fails". All shape cells (S1, S2, S3) fail, so **E5b cannot test P1**. As agreed before the run, nothing was changed afterwards, and P1/P2 are not decided from E5b.
+- Skipped (fewer than 5 usable channels): S1 on 6 machines, S2 on 8 machines (placement file lists them).
+
+**Next**
+- E4 CTU-13 + zigzag; dashboard; report.
+
+**Open decisions (Anirudh)**
+- Still open: TBD dates in `docs/decision_log.md`; `prereg-v3` tag on the remote; Step 4 self re-check.
+
 ## 2026-11-20 (later): P3 CI, V2 gap, E5b built (not run)
 
 **Done**
