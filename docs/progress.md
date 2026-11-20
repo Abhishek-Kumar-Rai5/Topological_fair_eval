@@ -24,6 +24,32 @@ Updated at the end of every task. Latest entry first.
 
 
 
+
+
+## 2026-11-19 (night, later): ROC-AUC added, exploratory Δ against F1
+
+**Done** (from existing E3 results; nothing rerun)
+- `scripts/summarize_smd.py` now also reports ROC-AUC (mean [95% CI]); E3 re-summarised. The PR-AUC numbers and §8 verdicts are unchanged.
+- Checked: false alarms per day merges consecutive false-alarm windows into one event (`src/metrics.py` `count_alarm_events`); the sampling interval is `minutes_per_point: 1.0` in `configs/e2_fair_retest.yaml` and `configs/e3_swap.yaml`, passed by `src/runner.py` to `evaluate`. F3 embeds the whole 38-channel window jointly (one 114-dim point cloud per window). F5 outputs 3 features.
+- **EXPLORATORY, not in the prereg** (`results/E3/E3_exploratory.csv`): paired cluster-bootstrap Δ PR-AUC against F1: F1+F2 −0.021 [−0.035, −0.006]; F1+F3 +0.047 [0.025, 0.072]; F1+F2+F3 +0.034 [0.012, 0.056]. Main Δ (F1+F2+F3 − F1+F2) is above 0 on 23 of 28 machines (4 below, 1 equal). No verdicts are attached to these.
+
+**Open decisions (Anirudh)**
+- Earlier items still open: fill TBD dates in `docs/decision_log.md`; check the `prereg-v3` tag is on the remote; Step 4 self re-check; harden `--resume` and file writes.
+
+## 2026-11-19 (night): E3 and E2 (our pipelines) run on SMD
+
+**Done**
+- E3 (5 feature sets) and E2 our pipelines (F1+F2, F1+F2+F3): 28 machines × 5 seeds, all at commit `9c28f8f`, `git_dirty` false. The laptop shut down twice mid-run; `--resume` continued from the saved machines (one half-written machine, 2-1, was deleted and rerun).
+- `scripts/summarize_smd.py` applies §6/§8 and writes `results/<exp>/<exp>_summary.csv` and `_verdicts.csv`.
+- Verdicts (prereg §8, PR-AUC): E3 Δ = +0.054 [0.035, 0.076] Helps; Δs = +0.067 [0.041, 0.097] Helps; E2 Δ identical to E3. Details in the summary files. Not interpreted yet.
+
+**Next**
+1. Adapters for TADA, PHANTOM, TAME (rest of E2), E1 (TAME as released, 2-day timebox), E5 injections, E4 CTU-13 + zigzag.
+2. Harden `--resume` and file writes against crashes (write to a temp file then rename; skip only valid files).
+
+**Open decisions (Anirudh)**
+- Earlier items still open: fill TBD dates in `docs/decision_log.md`; check the `prereg-v3` tag is on the remote; Step 4 self re-check.
+
 ## 2026-11-19 (evening): Step 11 F5 and the runner
 
 **Done**
