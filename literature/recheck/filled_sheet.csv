@@ -1,0 +1,8 @@
+id,title,authors,year,link,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,R13,OUT,ISO
+C01,Topological Data Analysis for Anomaly Detection in Host-Based Logs,Thomas Davies,2022,https://arxiv.org/pdf/2204.12919,Y,Y,N,Y,N,N,N,N,N,P,P,N,N,Lost,Replacement
+C02,Reliable Malware Analysis and Detection using Topology Data Analysis,Lionel Nganyewou Tidjon; Foutse Khomh,2022,https://arxiv.org/abs/2211.01535,P,P,N,U,N,N,Y,Y,N,N,N,Y,Y,Mixed,Replacement
+H04,Topological Analysis for Detecting Anomalies in dependent sequences: application to Time Series,Frédéric Chazal; Clément Levrard; Martin Royer,2024,https://www.jmlr.org/papers/v25/24-0853.html,Y,Y,P,NA,Y,Y,Y,N,N,Y,P,Y,Y,Mixed,Replacement
+I03,Malicious Cyber Activity Detection Using Zigzag Persistence,Audun Myers; Alyson Bittner; Sinan Aksoy; Daniel M. Best; Gregory Henselman-Petrusek; Helen Jenne; Cliff Joslyn; Bill Kay; Garret Seppala; Stephen J. Young; Emilie Purvine,2023,https://arxiv.org/html/2309.08010v1,Y,Y,Y,NA,N,N,N,N,N,P,P,N,Y,Helped,Replacement
+D04,Multivariate Time-Series Anomaly Detection based on Enhancing Graph Attention Networks with Topological Analysis,Zhe Liu; Xiang Huang; Jingyun Zhang; Zhifeng Hao; Li Sun; Hao Peng,2024,https://doi.org/10.1145/3627673.3679614,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U
+N10,Hybrid Topological Data Analysis and LSTM Networks for Enhanced Network Intrusion Detection Using CIC-IDS2017 Dataset,Amar Jeet; Bhaskar Ranjan Karn; Dinesh Kumar,2026,https://arxiv.org/abs/2606.31619,Y,N,N,Y,N,N,P,N,N,N,N,N,Y,Tied,Removal-only
+B03,Passive Encrypted IoT Device Fingerprinting with Persistent Homology,Joseph R. Collins; Michaela Iorga; Dmitry Cousin; David Chapman,2020,https://openreview.net/pdf?id=BXGqPm6nKgP,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U

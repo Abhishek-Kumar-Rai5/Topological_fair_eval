@@ -5,6 +5,18 @@ Updated at the end of every task. Latest entry first.
 
 
 
+## 2026-11-21 (latest): Step 4 self re-check, blind Claude coding of 7 papers
+
+**Done**
+- Scored C01, C02, H04, I03 and N10 from their full text. D04 (ACM returned 403) and B03 (OpenReview showed a browser check) could not be fetched, so they are scored U throughout.
+- Files: `literature/recheck/filled_sheet.csv` and `literature/recheck/filled_notes.md`.
+- Agreement on all 7 papers: R1–R13 54.9% (κ 0.40), OUT 42.9% (κ 0.33), ISO 71.4% (κ 0.55), all items 55.2% (κ 0.45).
+- On the 5 readable papers: R 76.9% (κ 0.66), OUT 3/5, ISO 5/5, all 77.3% (κ 0.70).
+
+**Open (Anirudh)**
+- Decide whether to report agreement on all 7 or on the 5 readable papers. Alternatively, get the D04 and B03 PDFs from a browser and re-score them.
+- Most disagreements are U, NA or P against a definite score, or R10 NA vs a score. Decide whether `definitions.md` needs a rule for R10 on non-benchmark data and for R4 when metrics are threshold-free.
+
 ## 2026-11-21 (later): Plan A-lite, step 2 (L1-L4 run)
 
 **Done** (exploratory, nothing decides a prediction; results in `results/L1`..`L4`, log `results/run_L_chain.log`)
